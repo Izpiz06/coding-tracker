@@ -1,0 +1,16 @@
+services:
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: coding-tracker-db
+    restart: always
+    environment:
+      POSTGRES_USER: tracker_admin
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: coding_tracker
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

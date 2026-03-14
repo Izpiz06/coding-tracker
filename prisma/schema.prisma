@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Platform {
+  LEETCODE
+  CODEFORCES
+}
+
+model User {
+  id               Int            @id @default(autoincrement())
+  name             String
+  leetcodeHandle   String?        @unique
+  codeforcesHandle String?        @unique
+  
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  
+  snapshots        StatSnapshot[]
+  submissions      Submission[]   // <-- This is the exact line Prisma was yelling about!
+}
+
+model StatSnapshot {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  platform        Platform
+  
+  easySolved      Int?
+  mediumSolved    Int?
+  hardSolved      Int?
+  
+  totalSolved     Int
+  
+  rating          Int?     
+  maxRating       Int?     
+  rank            String?  
+  
+  recordedAt      DateTime @default(now())
+
+  @@index([userId, platform])
+}
+
+model Submission {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  platform    Platform
+  problemId   String   
+  problemName String   
+  language    String?  
+  tags        String[] 
+  
+  runtime     Float?
+  memory      Float?
+  
+  solvedAt    DateTime @default(now())
+
+  @@unique([userId, platform, problemId])
+  @@index([userId, platform])
+}
