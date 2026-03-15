@@ -61,7 +61,7 @@ export default function TopicRadarChart({ submissions }: { submissions: any[] })
             <Tooltip 
               contentStyle={{ backgroundColor: '#171717', borderColor: '#262626', borderRadius: '8px' }}
               itemStyle={{ color: '#fff' }}
-              formatter={(value: number) => [value, 'Solved']}
+              formatter={(value: any) => [Number(value) || 0, 'Solved']}
               labelFormatter={(label) => {
                 // Find the full name for the tooltip
                 const original = data.find(d => d.subject === label);

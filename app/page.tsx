@@ -119,7 +119,8 @@ export default async function Home() {
 
                 {/* 3. Heatmap at the bottom */}
                 <div className="mt-4">
-                  <ActivityHeatmap snapshots={user.snapshots} />
+                  {/* THE FIX IS HERE: Changed snapshots to submissions */}
+                  <ActivityHeatmap submissions={user.submissions} />
                 </div>
                 
               </div>

@@ -1,66 +1,57 @@
 // components/ActivityHeatmap.tsx
 'use client';
 
-import {ActivityCalendar, ThemeInput } from 'react-activity-calendar';
+import { ActivityCalendar, ThemeInput } from 'react-activity-calendar';
 
-export default function ActivityHeatmap({ snapshots }: { snapshots: any[] }) {
-  // 1. Group snapshots by Date (YYYY-MM-DD) and find the max total for each platform per day
-  const dailyTotals = new Map<string, { lc: number; cf: number }>();
+export default function ActivityHeatmap({ submissions }: { submissions: any[] }) {
+  // 1. Count how many problems were solved on each specific day
+  const dailyCounts = new Map<string, number>();
 
-  // Sort snapshots oldest to newest to calculate progress
-  const sortedSnaps = [...snapshots].sort(
-    (a, b) => new Date(a.recordedAt).getTime() - new Date(b.recordedAt).getTime()
-  );
-
-  sortedSnaps.forEach((snap) => {
-    const dateStr = new Date(snap.recordedAt).toISOString().split('T')[0];
-    
-    if (!dailyTotals.has(dateStr)) {
-      dailyTotals.set(dateStr, { lc: 0, cf: 0 });
-    }
-    
-    const current = dailyTotals.get(dateStr)!;
-    if (snap.platform === 'LEETCODE') current.lc = Math.max(current.lc, snap.totalSolved);
-    if (snap.platform === 'CODEFORCES') current.cf = Math.max(current.cf, snap.totalSolved);
+  submissions.forEach((sub) => {
+    // Extract just the YYYY-MM-DD part of the date
+    const dateStr = new Date(sub.solvedAt).toISOString().split('T')[0];
+    dailyCounts.set(dateStr, (dailyCounts.get(dateStr) || 0) + 1);
   });
 
-  // 2. Calculate the daily difference (problems solved exactly on that day)
-  const calendarData: { date: string; count: number; level: number }[] = [];
-  let previousTotal = 0;
-  let currentStreak = 0;
-
-  Array.from(dailyTotals.entries()).forEach(([date, totals]) => {
-    const dayTotal = totals.lc + totals.cf;
-    
-    // Calculate how many were solved today vs yesterday
-    let dailySolved = 0;
-    if (previousTotal > 0) {
-      dailySolved = dayTotal - previousTotal;
-    }
-    
+  // 2. Format the data for the Calendar component
+  const calendarData = Array.from(dailyCounts.entries()).map(([date, count]) => {
     // Determine the "green" level (0 = none, 1-4 = light to dark green)
     let level = 0;
-    if (dailySolved > 0) level = 1;
-    if (dailySolved > 2) level = 2;
-    if (dailySolved > 5) level = 3;
-    if (dailySolved > 10) level = 4;
+    if (count > 0) level = 1;
+    if (count > 2) level = 2;
+    if (count > 5) level = 3;
+    if (count >= 10) level = 4;
 
-    calendarData.push({ date, count: Math.max(0, dailySolved), level });
-    
-    // Streak logic
-    if (dailySolved > 0) {
-      currentStreak++;
-    } else {
-      currentStreak = 0; // Reset streak if 0 solved
-    }
-
-    previousTotal = dayTotal;
+    return { date, count, level };
   });
 
-  // Ensure we have at least one data point to prevent calendar crashes
+  // Sort by date ascending (oldest to newest)
+  calendarData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  // Ensure we have at least one data point so the calendar doesn't crash on empty DBs
   if (calendarData.length === 0) {
     const today = new Date().toISOString().split('T')[0];
     calendarData.push({ date: today, count: 0, level: 0 });
+  }
+
+  // 3. Calculate the True Current Streak
+  let currentStreak = 0;
+  const todayStr = new Date().toISOString().split('T')[0];
+  const yesterdayStr = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+  // A streak is only alive if you solved something today or yesterday
+  if (dailyCounts.has(todayStr) || dailyCounts.has(yesterdayStr)) {
+    let checkDate = dailyCounts.has(todayStr) ? new Date(todayStr) : new Date(yesterdayStr);
+    
+    while (true) {
+      const checkStr = checkDate.toISOString().split('T')[0];
+      if (dailyCounts.has(checkStr)) {
+        currentStreak++;
+        checkDate.setDate(checkDate.getDate() - 1); // Go back one day
+      } else {
+        break; // Streak broken
+      }
+    }
   }
 
   // Customizing the GitHub-style green colors
