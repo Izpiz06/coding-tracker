@@ -7,7 +7,7 @@ import ActivityHeatmap from '../components/ActivityHeatmap';
 import LanguagePieChart from '../components/LanguagePieChart';
 import TopicRadarChart from '../components/TopicRadarChart';
 
-export const revalidate = 0; 
+export const revalidate = 0;
 
 export default async function Home() {
   const users = await prisma.user.findMany({
@@ -22,15 +22,15 @@ export default async function Home() {
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-50 p-8">
       <div className="max-w-6xl mx-auto">
-        
+
         {/* Header containing the Title, Link, and Sync Button */}
         <div className="flex flex-col md:flex-row items-center justify-between mb-10 gap-4 bg-neutral-900/50 p-6 rounded-2xl border border-neutral-800">
           <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
             Coding Progress Tracker
           </h1>
           <div className="flex flex-wrap items-center gap-4">
-            <Link 
-              href="/problems" 
+            <Link
+              href="/problems"
               className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-white rounded-lg font-bold text-sm transition-all"
             >
               View All Questions
@@ -103,12 +103,12 @@ export default async function Home() {
 
                 {/* --- The Stacked Visualizations Layout --- */}
                 <div className="mt-8 pt-6 border-t border-neutral-800 space-y-4">
-                  
+
                   {/* 1. Full-width Line Chart on top */}
                   <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 shadow-xl">
                     <ProgressChart snapshots={user.snapshots} />
                   </div>
-                  
+
                   {/* 2. Donut Chart and Radar Chart side-by-side below it */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <LanguagePieChart submissions={user.submissions} />
@@ -122,7 +122,7 @@ export default async function Home() {
                   {/* THE FIX IS HERE: Changed snapshots to submissions */}
                   <ActivityHeatmap submissions={user.submissions} />
                 </div>
-                
+
               </div>
             );
           })}

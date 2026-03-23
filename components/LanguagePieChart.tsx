@@ -10,7 +10,7 @@ export default function LanguagePieChart({ submissions }: { submissions: any[] }
   submissions.forEach((sub) => {
     // Some platforms return null or weird strings, let's clean it up a bit
     const lang = sub.language || 'Unknown';
-    
+
     // Group variations of languages together (e.g., "GNU C++17" -> "C++")
     let cleanLang = lang;
     if (lang.toLowerCase().includes('c++') || lang.toLowerCase().includes('cpp')) cleanLang = 'C++';
@@ -60,13 +60,13 @@ export default function LanguagePieChart({ submissions }: { submissions: any[] }
               stroke="none"
             >
               {data.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
+                <Cell
+                  key={`cell-${index}`}
                   fill={COLORS[entry.name] || '#10b981'} // Default to emerald green if not mapped
                 />
               ))}
             </Pie>
-            <Tooltip 
+            <Tooltip
               contentStyle={{ backgroundColor: '#171717', borderColor: '#262626', borderRadius: '8px' }}
               itemStyle={{ color: '#fff' }}
             />

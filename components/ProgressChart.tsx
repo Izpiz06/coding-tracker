@@ -1,8 +1,8 @@
 // components/ProgressChart.tsx
 'use client';
 
-import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 
 export default function ProgressChart({ snapshots }: { snapshots: any[] }) {
@@ -11,14 +11,14 @@ export default function ProgressChart({ snapshots }: { snapshots: any[] }) {
 
   snapshots.forEach((snap) => {
     // Format the date to something clean like "Mar 14"
-    const date = new Date(snap.recordedAt).toLocaleDateString('en-US', { 
-      month: 'short', day: 'numeric' 
+    const date = new Date(snap.recordedAt).toLocaleDateString('en-US', {
+      month: 'short', day: 'numeric'
     });
-    
+
     if (!dataMap.has(date)) {
       dataMap.set(date, { date });
     }
-    
+
     const existingDate = dataMap.get(date);
 
     // Assign the correct platform stats to that specific date
@@ -47,27 +47,27 @@ export default function ProgressChart({ snapshots }: { snapshots: any[] }) {
           <CartesianGrid strokeDasharray="3 3" stroke="#262626" vertical={false} />
           <XAxis dataKey="date" stroke="#737373" fontSize={12} tickLine={false} axisLine={false} />
           <YAxis stroke="#737373" fontSize={12} tickLine={false} axisLine={false} />
-          <Tooltip 
+          <Tooltip
             contentStyle={{ backgroundColor: '#171717', borderColor: '#262626', borderRadius: '8px' }}
             itemStyle={{ color: '#fff' }}
           />
-          <Legend wrapperStyle={{ paddingTop: '20px' }}/>
-          <Line 
-            type="monotone" 
-            dataKey="leetCodeSolved" 
-            name="LeetCode" 
+          <Legend wrapperStyle={{ paddingTop: '20px' }} />
+          <Line
+            type="monotone"
+            dataKey="leetCodeSolved"
+            name="LeetCode"
             stroke="#f97316" // Orange
-            strokeWidth={3} 
-            dot={{ r: 4, strokeWidth: 2 }} 
+            strokeWidth={3}
+            dot={{ r: 4, strokeWidth: 2 }}
             activeDot={{ r: 6 }}
           />
-          <Line 
-            type="monotone" 
-            dataKey="codeforcesSolved" 
-            name="Codeforces" 
+          <Line
+            type="monotone"
+            dataKey="codeforcesSolved"
+            name="Codeforces"
             stroke="#3b82f6" // Blue
-            strokeWidth={3} 
-            dot={{ r: 4, strokeWidth: 2 }} 
+            strokeWidth={3}
+            dot={{ r: 4, strokeWidth: 2 }}
             activeDot={{ r: 6 }}
           />
         </LineChart>

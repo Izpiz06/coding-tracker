@@ -42,7 +42,7 @@ export default function ActivityHeatmap({ submissions }: { submissions: any[] })
   // A streak is only alive if you solved something today or yesterday
   if (dailyCounts.has(todayStr) || dailyCounts.has(yesterdayStr)) {
     let checkDate = dailyCounts.has(todayStr) ? new Date(todayStr) : new Date(yesterdayStr);
-    
+
     while (true) {
       const checkStr = checkDate.toISOString().split('T')[0];
       if (dailyCounts.has(checkStr)) {
@@ -71,10 +71,10 @@ export default function ActivityHeatmap({ submissions }: { submissions: any[] })
           <div className="text-2xl font-black text-emerald-400">🔥 {currentStreak} Days</div>
         </div>
       </div>
-      
+
       <div className="flex justify-center overflow-x-auto pb-4">
-        <ActivityCalendar 
-          data={calendarData} 
+        <ActivityCalendar
+          data={calendarData}
           theme={greenTheme}
           colorScheme="dark"
           labels={{

@@ -13,11 +13,11 @@ export default function SyncButton() {
     try {
       const res = await fetch('/api/sync');
       const data = await res.json();
-      
+
       if (data.success) {
         // This magical function tells Next.js to refresh the Server Component
         // in the background and update the UI with the fresh database stats!
-        router.refresh(); 
+        router.refresh();
       } else {
         alert('Sync failed: ' + (data.error || 'Unknown error'));
       }
@@ -29,12 +29,12 @@ export default function SyncButton() {
   };
 
   return (
-    <button 
-      onClick={handleSync} 
+    <button
+      onClick={handleSync}
       disabled={isSyncing}
       className={`px-6 py-2 rounded-lg font-bold text-sm transition-all flex items-center gap-2
-        ${isSyncing 
-          ? 'bg-neutral-800 text-neutral-500 cursor-not-allowed border border-neutral-700' 
+        ${isSyncing
+          ? 'bg-neutral-800 text-neutral-500 cursor-not-allowed border border-neutral-700'
           : 'bg-emerald-600/10 text-emerald-400 border border-emerald-500/50 hover:bg-emerald-500 hover:text-white hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]'
         }`}
     >
@@ -44,7 +44,7 @@ export default function SyncButton() {
         </>
       ) : (
         <>
-         Sync Latest Stats
+          Sync Latest Stats
         </>
       )}
     </button>

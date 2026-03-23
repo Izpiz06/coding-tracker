@@ -1,8 +1,8 @@
 // components/TopicRadarChart.tsx
 'use client';
 
-import { 
-  Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip 
+import {
+  Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip
 } from 'recharts';
 
 export default function TopicRadarChart({ submissions }: { submissions: any[] }) {
@@ -22,11 +22,11 @@ export default function TopicRadarChart({ submissions }: { submissions: any[] })
   // 2. Sort by frequency and take the top 6 topics to make a clean hexagon
   const sortedTags = Array.from(tagCounts.entries())
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 6); 
+    .slice(0, 6);
 
   const data = sortedTags.map(([subject, count]) => ({
     // Truncate really long tags so they don't overlap on the chart
-    subject: subject.length > 12 ? subject.substring(0, 12) + '...' : subject, 
+    subject: subject.length > 12 ? subject.substring(0, 12) + '...' : subject,
     count,
     fullSubject: subject
   }));
@@ -58,7 +58,7 @@ export default function TopicRadarChart({ submissions }: { submissions: any[] })
               fill="#10b981"
               fillOpacity={0.4}
             />
-            <Tooltip 
+            <Tooltip
               contentStyle={{ backgroundColor: '#171717', borderColor: '#262626', borderRadius: '8px' }}
               itemStyle={{ color: '#fff' }}
               formatter={(value: any) => [Number(value) || 0, 'Solved']}
