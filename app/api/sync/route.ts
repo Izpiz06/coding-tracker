@@ -4,11 +4,26 @@ import { prisma } from '../../../lib/prisma';
 import { getLeetCodeStats } from '../../../lib/leetcode';
 import { getCodeforcesStats } from '../../../lib/codeforces';
 
-export async function GET() {
+export async function GET(request: Request) {
+  // --- THE SECURITY LOCKDOWN ---
+  const authHeader = request.headers.get('authorization');
+  const url = new URL(request.url);
+  const passcode = url.searchParams.get('passcode');
+
+  // 1. Vercel automatically sends a CRON_SECRET header when it runs the nightly job.
+  // 2. We also allow your ADMIN_PASSCODE so you can trigger it manually from your browser if needed.
+  if (
+    authHeader !== `Bearer ${process.env.CRON_SECRET}` &&
+    passcode !== process.env.ADMIN_PASSCODE
+  ) {
+    return NextResponse.json({ error: "Unauthorized access. Route is locked." }, { status: 401 });
+  }
+  // -----------------------------
+
   try {
     const users = await prisma.user.findMany();
     let snapshotsCreated = 0;
-    let submissionsChecked = 0; // Track how many problems we processed
+    let submissionsChecked = 0; 
 
     for (const user of users) {
       
@@ -16,7 +31,6 @@ export async function GET() {
       if (user.leetcodeHandle) {
         const lcStats = await getLeetCodeStats(user.leetcodeHandle);
         if (lcStats) {
-          // 1. Save the aggregate snapshot
           await prisma.statSnapshot.create({
             data: {
               userId: user.id,
@@ -29,7 +43,6 @@ export async function GET() {
           });
           snapshotsCreated++;
 
-          // 2. Save the actual problem submissions
           if (lcStats.submissions) {
             for (const sub of lcStats.submissions) {
               await prisma.submission.upsert({
@@ -40,7 +53,7 @@ export async function GET() {
                     problemId: sub.problemId,
                   }
                 },
-                update: {}, // If it already exists, do nothing (preserves original solve date)
+                update: {}, 
                 create: {
                   userId: user.id,
                   platform: 'LEETCODE',
@@ -63,7 +76,6 @@ export async function GET() {
       if (user.codeforcesHandle) {
         const cfStats = await getCodeforcesStats(user.codeforcesHandle);
         if (cfStats) {
-          // 1. Save the aggregate snapshot
           await prisma.statSnapshot.create({
             data: {
               userId: user.id,
@@ -76,7 +88,6 @@ export async function GET() {
           });
           snapshotsCreated++;
 
-          // 2. Save the actual problem submissions
           if (cfStats.submissions) {
             for (const sub of cfStats.submissions) {
               await prisma.submission.upsert({
@@ -87,7 +98,7 @@ export async function GET() {
                     problemId: sub.problemId,
                   }
                 },
-                update: {}, // Do nothing if it exists
+                update: {}, 
                 create: {
                   userId: user.id,
                   platform: 'CODEFORCES',
