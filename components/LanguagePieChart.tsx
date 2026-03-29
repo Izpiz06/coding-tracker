@@ -123,7 +123,7 @@ export default function LanguagePieChart({
   }
 
   return (
-    <div className="h-64 w-full bg-neutral-900 border border-neutral-800 rounded-xl p-4 shadow-xl flex flex-col">
+    <div className="h-72 w-full bg-neutral-900 border border-neutral-800 rounded-xl p-4 shadow-xl flex flex-col">
       <h3 className="text-sm font-bold text-neutral-400 uppercase tracking-widest text-center mb-2">
         Language Distribution
       </h3>
@@ -151,7 +151,7 @@ export default function LanguagePieChart({
               contentStyle={{ backgroundColor: '#171717', borderColor: '#262626', borderRadius: '8px' }}
               itemStyle={{ color: '#fff' }}
             />
-            <Legend verticalAlign="bottom" height={36} iconType="circle" />
+            <Legend verticalAlign="bottom" height={28} iconType="circle" />
           </PieChart>
         </ResponsiveContainer>
       </div>

@@ -74,7 +74,7 @@ export default function ProgressChart({ snapshots }: { snapshots: Snapshot[] }) 
   }
 
   return (
-    <div className="h-64 w-full mt-8 border-t border-neutral-800 pt-6">
+    <div className="h-72 w-full mt-6 border-t border-neutral-800 pt-4">
       <h3 className="text-sm font-bold text-neutral-400 uppercase tracking-widest mb-4">
         Growth Over Time
       </h3>
