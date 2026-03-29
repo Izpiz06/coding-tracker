@@ -134,9 +134,9 @@ export default function LanguagePieChart({
               data={data}
               cx="50%"
               cy="50%"
-              innerRadius={60} // This makes it a Donut chart instead of a solid Pie
-              outerRadius={80}
-              paddingAngle={5}
+              innerRadius={56} // This makes it a Donut chart instead of a solid Pie
+              outerRadius={84}
+              paddingAngle={4}
               dataKey="value"
               stroke="none"
             >

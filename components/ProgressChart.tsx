@@ -87,7 +87,7 @@ export default function ProgressChart({ snapshots }: { snapshots: Snapshot[] }) 
             contentStyle={{ backgroundColor: '#171717', borderColor: '#262626', borderRadius: '8px' }}
             itemStyle={{ color: '#fff' }}
           />
-          <Legend wrapperStyle={{ paddingTop: '20px' }} />
+          <Legend wrapperStyle={{ paddingTop: '10px' }} />
           <Line
             type="monotone"
             dataKey="leetCodeSolved"
