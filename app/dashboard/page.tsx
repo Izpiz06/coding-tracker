@@ -9,6 +9,7 @@ import LanguagePieChart from '../../components/LanguagePieChart';
 import TopicRadarChart from '../../components/TopicRadarChart';
 import LogoutButton from '../../components/LogoutButton';
 import { getCurrentUser } from '../../lib/auth';
+import { getLanguageDistributionForUser } from '../../lib/languageDistribution';
 import { RiArrowLeftLine, RiBarChartLine, RiFireLine, RiLineChartLine, RiPieChart2Line } from 'react-icons/ri';
 
 export const revalidate = 0;
@@ -39,6 +40,15 @@ export default async function DashboardPage() {
 
   const latestLeetCode = user.snapshots.find(s => s.platform === 'LEETCODE');
   const latestCodeforces = user.snapshots.find(s => s.platform === 'CODEFORCES');
+
+  const languageData = await getLanguageDistributionForUser({
+    leetcodeHandle: user.leetcodeHandle,
+    codeforcesHandle: user.codeforcesHandle,
+    fallbackSubmissions: user.submissions.map((sub) => ({
+      platform: sub.platform,
+      language: sub.language,
+    })),
+  });
 
   return (
     <main className="site-shell text-slate-100">
@@ -138,8 +148,8 @@ export default async function DashboardPage() {
           {/* Language & Topic Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="panel p-6">
-              <h3 className="text-xl font-bold mb-4 inline-flex items-center gap-2"><RiPieChart2Line className="text-zinc-300" /> Languages</h3>
-              <LanguagePieChart submissions={user.submissions} />
+              <h3 className="text-xl font-bold mb-4 inline-flex items-center gap-2"><RiPieChart2Line className="text-zinc-300" /> Languages (Your Lifetime from Coding Sites)</h3>
+              <LanguagePieChart submissions={user.submissions} languageData={languageData} />
             </div>
             <div className="panel p-6">
               <h3 className="text-xl font-bold mb-4 inline-flex items-center gap-2"><RiPieChart2Line className="text-zinc-300" /> Topics</h3>
