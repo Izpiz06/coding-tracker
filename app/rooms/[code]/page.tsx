@@ -15,6 +15,7 @@ import {
     RiCalendarEventLine,
     RiCheckboxCircleLine,
     RiCloseLine,
+    RiGithubFill,
     RiGroupLine,
     RiMedalLine,
     RiRefreshLine,
@@ -39,6 +40,7 @@ interface LeaderboardEntry {
     rank: number;
     userId: number;
     name: string;
+    githubHandle: string | null;
     role: string;
     score: number;
     lcScore: number;
@@ -318,6 +320,11 @@ export default function RoomDashboard({
                                                         CF: {entry.stats.codeforces.total} solved • {entry.stats.codeforces.rating} rating
                                                     </span>
                                                 )}
+                                                {entry.githubHandle && (
+                                                    <span className="inline-flex items-center gap-1 text-zinc-300/80">
+                                                        <RiGithubFill className="text-sm" /> @{entry.githubHandle}
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
 
@@ -405,6 +412,32 @@ export default function RoomDashboard({
                     <ActivityHeatmap submissions={allSubmissions} />
                 </div>
 
+                {/* ═══ Development Handles ═══ */}
+                <div className="panel p-6 mb-8">
+                    <h2 className="inline-flex items-center gap-2 text-sm font-bold text-zinc-300 uppercase tracking-[0.15em] mb-4">
+                        <RiGithubFill className="text-zinc-300" /> Development
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                        {leaderboard.map((entry) => (
+                            <div key={`gh-${entry.userId}`} className="bg-zinc-950/60 border border-zinc-700/60 rounded-lg p-3">
+                                <div className="text-sm font-semibold text-zinc-200">{entry.name}</div>
+                                {entry.githubHandle ? (
+                                    <a
+                                        href={`https://github.com/${entry.githubHandle}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="mt-1 inline-flex items-center gap-1 text-xs text-zinc-300 hover:text-zinc-100 transition-colors"
+                                    >
+                                        <RiGithubFill className="text-sm" /> @{entry.githubHandle}
+                                    </a>
+                                ) : (
+                                    <div className="mt-1 text-xs text-zinc-500">GitHub not set</div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
                 {/* ═══ Member Comparison View ═══ */}
                 {selectedEntries.length > 0 && (
                     <div className="panel p-6 mb-8">
@@ -431,6 +464,9 @@ export default function RoomDashboard({
                                         <div>
                                             <h3 className="text-lg font-bold text-zinc-100">{entry.name}</h3>
                                             <p className="text-xs text-zinc-500">Rank #{entry.rank} • {entry.periodSubmissions.total} solves this period</p>
+                                            <p className="text-xs text-zinc-500 mt-1 inline-flex items-center gap-1">
+                                                <RiGithubFill className="text-sm" /> {entry.githubHandle ? `@${entry.githubHandle}` : 'GitHub not set'}
+                                            </p>
                                         </div>
                                         <div className="text-right">
                                             <div className="text-xl font-black text-zinc-100">{entry.score}</div>

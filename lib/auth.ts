@@ -5,6 +5,19 @@ import { prisma } from './prisma';
 const SESSION_COOKIE = 'tracker_session';
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 30; // 30 days
 
+function isPrismaConnectionError(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as { code?: string }).code === 'P1001'
+  );
+}
+
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export interface AuthUser {
   id: number;
   name: string;
@@ -44,21 +57,55 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     return null;
   }
 
-  const session = await prisma.session.findUnique({
-    where: { token },
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          githubHandle: true,
-          leetcodeHandle: true,
-          codeforcesHandle: true,
+  let session = null;
+
+  try {
+    session = await prisma.session.findUnique({
+      where: { token },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            githubHandle: true,
+            leetcodeHandle: true,
+            codeforcesHandle: true,
+          },
         },
       },
-    },
-  });
+    });
+  } catch (error) {
+    if (!isPrismaConnectionError(error)) {
+      throw error;
+    }
+
+    // One quick retry for transient DB network hiccups.
+    await wait(300);
+    try {
+      session = await prisma.session.findUnique({
+        where: { token },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              githubHandle: true,
+              leetcodeHandle: true,
+              codeforcesHandle: true,
+            },
+          },
+        },
+      });
+    } catch (retryError) {
+      if (isPrismaConnectionError(retryError)) {
+        console.error('Database temporarily unreachable in getCurrentUser (P1001)');
+        return null;
+      }
+      throw retryError;
+    }
+  }
 
   if (!session) {
     return null;

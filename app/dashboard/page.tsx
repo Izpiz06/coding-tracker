@@ -7,9 +7,11 @@ import ProgressChart from '../../components/ProgressChart';
 import ActivityHeatmap from '../../components/ActivityHeatmap';
 import LanguagePieChart from '../../components/LanguagePieChart';
 import TopicRadarChart from '../../components/TopicRadarChart';
+import DashboardCpDevCard from '../../components/DashboardCpDevCard';
 import LogoutButton from '../../components/LogoutButton';
 import { getCurrentUser } from '../../lib/auth';
 import { getLanguageDistributionForUser } from '../../lib/languageDistribution';
+import { getGitHubStats } from '../../lib/github';
 import { RiArrowLeftLine, RiBarChartLine, RiFireLine, RiLineChartLine, RiPieChart2Line } from 'react-icons/ri';
 
 export const revalidate = 0;
@@ -25,6 +27,7 @@ export default async function DashboardPage() {
     select: {
       id: true,
       name: true,
+      githubHandle: true,
       leetcodeHandle: true,
       codeforcesHandle: true,
       snapshots: {
@@ -40,6 +43,7 @@ export default async function DashboardPage() {
 
   const latestLeetCode = user.snapshots.find(s => s.platform === 'LEETCODE');
   const latestCodeforces = user.snapshots.find(s => s.platform === 'CODEFORCES');
+  const githubStats = await getGitHubStats(user.githubHandle);
 
   const languageData = await getLanguageDistributionForUser({
     leetcodeHandle: user.leetcodeHandle,
@@ -74,67 +78,12 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-
-          {/* LeetCode Card */}
-          {latestLeetCode ? (
-            <div className="panel p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold">LeetCode</h2>
-                <span className="text-3xl font-black text-orange-400">{latestLeetCode.totalSolved}</span>
-              </div>
-              <div className="grid grid-cols-3 gap-3 text-center">
-                <div className="bg-green-500/10 text-green-400 p-4 rounded-lg">
-                  <div className="text-2xl font-bold">{latestLeetCode.easySolved}</div>
-                  <div className="text-xs uppercase tracking-wider text-green-300 mt-1">Easy</div>
-                </div>
-                <div className="bg-yellow-500/10 text-yellow-400 p-4 rounded-lg">
-                  <div className="text-2xl font-bold">{latestLeetCode.mediumSolved}</div>
-                  <div className="text-xs uppercase tracking-wider text-yellow-300 mt-1">Medium</div>
-                </div>
-                <div className="bg-red-500/10 text-red-400 p-4 rounded-lg">
-                  <div className="text-2xl font-bold">{latestLeetCode.hardSolved}</div>
-                  <div className="text-xs uppercase tracking-wider text-red-300 mt-1">Hard</div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="panel p-6 text-slate-500 italic">
-              No LeetCode data yet. Hit sync to get started!
-            </div>
-          )}
-
-          {/* Codeforces Card */}
-          {latestCodeforces ? (
-            <div className="panel p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold">Codeforces</h2>
-                <span className="text-3xl font-black text-zinc-100">{latestCodeforces.totalSolved}</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-neutral-800 p-4 rounded-lg">
-                  <div className="text-neutral-400 text-xs uppercase tracking-wider mb-2">Current Rating</div>
-                  <div className="text-3xl font-bold">{latestCodeforces.rating || 'N/A'}</div>
-                </div>
-                <div className="bg-neutral-800 p-4 rounded-lg">
-                  <div className="text-neutral-400 text-xs uppercase tracking-wider mb-2">Peak Rating</div>
-                  <div className="text-3xl font-bold">{latestCodeforces.maxRating || 'N/A'}</div>
-                </div>
-              </div>
-              {latestCodeforces.rank && (
-                <p className="text-sm text-neutral-400 mt-4">
-                  Rank: <span className="text-white font-semibold">{latestCodeforces.rank}</span>
-                </p>
-              )}
-            </div>
-          ) : (
-            <div className="panel p-6 text-slate-500 italic">
-              No Codeforces data yet. Hit sync to get started!
-            </div>
-          )}
-
-        </div>
+        <DashboardCpDevCard
+          latestLeetCode={latestLeetCode || null}
+          latestCodeforces={latestCodeforces || null}
+          githubHandle={user.githubHandle}
+          githubStats={githubStats}
+        />
 
         {/* Charts */}
         <div className="space-y-8">
