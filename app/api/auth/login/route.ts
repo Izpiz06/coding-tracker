@@ -22,8 +22,11 @@ export async function POST(request: Request) {
     const token = await createSession(user.id);
     await setSessionCookie(token);
 
+    const hasHandles = !!(user.leetcodeHandle && user.codeforcesHandle);
+
     return NextResponse.json({
       success: true,
+      hasHandles,
       user: {
         id: user.id,
         name: user.name,

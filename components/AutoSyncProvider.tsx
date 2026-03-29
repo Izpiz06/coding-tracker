@@ -7,8 +7,8 @@ import { useAutoSync } from '@/lib/useAutoSync';
  * Place anywhere in your app that you want auto-sync enabled
  */
 export default function AutoSyncProvider() {
-  // Auto-sync every 30 minutes (1800000 ms)
-  useAutoSync(30 * 60 * 1000);
-  
+  // Auto-sync every 1 hour (3600000 ms)
+  useAutoSync(60 * 60 * 1000);
+
   return null;
 }
