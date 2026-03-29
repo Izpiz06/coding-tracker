@@ -48,7 +48,7 @@ export default async function DashboardPage() {
         <div className="panel flex flex-col md:flex-row items-center justify-between mb-10 gap-4 p-6">
           <div>
             <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-100 inline-flex items-center gap-2">
-              <RiBarChartLine className="text-sky-300" /> Your Dashboard
+              <RiBarChartLine className="text-zinc-300" /> Your Dashboard
             </h1>
             <p className="text-sm text-slate-400 mt-1">{user.name}</p>
           </div>
@@ -100,7 +100,7 @@ export default async function DashboardPage() {
             <div className="panel p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-bold">Codeforces</h2>
-                <span className="text-3xl font-black text-blue-400">{latestCodeforces.totalSolved}</span>
+                <span className="text-3xl font-black text-zinc-100">{latestCodeforces.totalSolved}</span>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-neutral-800 p-4 rounded-lg">
@@ -131,25 +131,25 @@ export default async function DashboardPage() {
 
           {/* Progress Chart */}
           <div className="panel p-6">
-            <h3 className="text-xl font-bold mb-4 inline-flex items-center gap-2"><RiLineChartLine className="text-sky-300" /> Growth Over Time</h3>
+            <h3 className="text-xl font-bold mb-4 inline-flex items-center gap-2"><RiLineChartLine className="text-zinc-300" /> Growth Over Time</h3>
             <ProgressChart snapshots={user.snapshots} />
           </div>
 
           {/* Language & Topic Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="panel p-6">
-              <h3 className="text-xl font-bold mb-4 inline-flex items-center gap-2"><RiPieChart2Line className="text-sky-300" /> Languages</h3>
+              <h3 className="text-xl font-bold mb-4 inline-flex items-center gap-2"><RiPieChart2Line className="text-zinc-300" /> Languages</h3>
               <LanguagePieChart submissions={user.submissions} />
             </div>
             <div className="panel p-6">
-              <h3 className="text-xl font-bold mb-4 inline-flex items-center gap-2"><RiPieChart2Line className="text-sky-300" /> Topics</h3>
+              <h3 className="text-xl font-bold mb-4 inline-flex items-center gap-2"><RiPieChart2Line className="text-zinc-300" /> Topics</h3>
               <TopicRadarChart submissions={user.submissions} />
             </div>
           </div>
 
           {/* Activity Heatmap */}
           <div className="panel p-6">
-            <h3 className="text-xl font-bold mb-4 inline-flex items-center gap-2"><RiFireLine className="text-sky-300" /> Activity Heatmap</h3>
+            <h3 className="text-xl font-bold mb-4 inline-flex items-center gap-2"><RiFireLine className="text-zinc-300" /> Activity Heatmap</h3>
             <ActivityHeatmap submissions={user.submissions} />
           </div>
 

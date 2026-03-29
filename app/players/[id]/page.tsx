@@ -85,7 +85,7 @@ export default async function PlayerProfilePage({
           </div>
 
           <div className="panel p-4">
-            <h3 className="text-sm uppercase tracking-widest text-blue-400 mb-2">Codeforces Snapshot</h3>
+            <h3 className="text-sm uppercase tracking-widest text-zinc-300 mb-2">Codeforces Snapshot</h3>
             {latestCodeforces ? (
               <ul className="text-sm text-slate-300 space-y-1">
                 <li>Total Solved: {latestCodeforces.totalSolved}</li>

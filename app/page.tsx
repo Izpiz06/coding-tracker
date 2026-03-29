@@ -100,7 +100,7 @@ export default async function Home() {
               href="/dashboard"
               className="btn-ghost inline-flex items-center gap-2 px-4 py-2 text-sm"
             >
-              <RiBarChartLine className="text-sky-300" /> Dashboard
+              <RiBarChartLine className="text-zinc-300" /> Dashboard
             </Link>
             <Link
               href="/problems"
@@ -112,7 +112,7 @@ export default async function Home() {
               href="/profile/setup"
               className="btn-ghost inline-flex items-center gap-2 px-4 py-2 text-sm"
             >
-              <RiUserSettingsLine className="text-sky-300" /> Profile
+              <RiUserSettingsLine className="text-zinc-300" /> Profile
             </Link>
             <SyncButton />
             <LogoutButton />
@@ -131,21 +131,21 @@ export default async function Home() {
         {/* Global Leaderboard */}
         <div className="panel overflow-hidden mb-10">
           <div className="px-6 py-4 border-b border-slate-700/50 bg-slate-900/70">
-            <h2 className="section-title inline-flex items-center gap-2"><RiMedalLine className="text-sky-300" /> Global Leaderboard</h2>
+            <h2 className="section-title inline-flex items-center gap-2"><RiMedalLine className="text-zinc-300" /> Global Leaderboard</h2>
           </div>
           <div className="divide-y divide-slate-700/40">
             {globalLeaderboard.map((entry, index) => (
               <div key={entry.id} className="px-6 py-4 flex items-center justify-between gap-4 hover:bg-slate-800/25 transition-colors">
                 <div className="flex items-center gap-3">
                   <span className="text-slate-400 w-8 font-bold">#{index + 1}</span>
-                  <Link href={`/players/${entry.id}`} className="font-bold hover:text-sky-300 transition-colors">
+                  <Link href={`/players/${entry.id}`} className="font-bold hover:text-zinc-300 transition-colors">
                     {entry.name}
                   </Link>
                 </div>
                 <div className="text-sm text-slate-400 hidden md:block">
                   LC {entry.leetcodeTotal} • CF {entry.codeforcesTotal}
                 </div>
-                <div className="text-xl font-black text-sky-300">{entry.score}</div>
+                <div className="text-xl font-black text-zinc-100">{entry.score}</div>
               </div>
             ))}
           </div>
@@ -154,7 +154,7 @@ export default async function Home() {
         {/* My Rooms Section */}
         <div className="panel overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-700/50 bg-slate-900/70 flex items-center justify-between">
-            <h2 className="section-title inline-flex items-center gap-2"><RiGamepadLine className="text-sky-300" /> My Rooms</h2>
+            <h2 className="section-title inline-flex items-center gap-2"><RiGamepadLine className="text-zinc-300" /> My Rooms</h2>
             <Link
               href="/rooms"
               className="btn-primary px-3 py-1 text-sm"
@@ -170,7 +170,7 @@ export default async function Home() {
                 href="/rooms"
                 className="btn-primary inline-flex items-center gap-2 px-6 py-3"
               >
-                <RiTeamLine className="text-sky-300" />
+                <RiTeamLine className="text-zinc-300" />
                 Create Your First Room
               </Link>
             </div>
@@ -183,13 +183,13 @@ export default async function Home() {
                   className="px-6 py-4 flex items-center justify-between gap-4 hover:bg-slate-800/30 transition-colors group"
                 >
                   <div className="flex-1">
-                    <h3 className="font-bold text-lg group-hover:text-sky-300 transition-colors">
+                    <h3 className="font-bold text-lg group-hover:text-zinc-300 transition-colors">
                       {room.name}
                     </h3>
                     <p className="text-sm text-slate-400">
                       Code: <span className="font-mono bg-slate-800/80 px-2 py-1 rounded">{room.joinCode}</span>
                       {currentUser.id === room.createdById && (
-                        <span className="ml-2 px-2 py-1 bg-sky-900/30 text-sky-300 rounded text-xs font-bold inline-flex items-center gap-1">
+                        <span className="ml-2 px-2 py-1 bg-zinc-900/70 text-zinc-300 border border-zinc-700/60 rounded text-xs font-bold inline-flex items-center gap-1">
                           <RiDoorLockBoxLine />
                           OWNER
                         </span>

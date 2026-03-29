@@ -90,7 +90,7 @@ function JoinRoomForm() {
                 {/* Room Preview Card */}
                 {roomPreview && (
                     <div className="panel p-6 mb-6 text-center">
-                        <div className="text-xs uppercase tracking-widest text-sky-300/70 mb-2">
+                        <div className="text-xs uppercase tracking-widest text-zinc-300/80 mb-2">
                             You&apos;re invited to
                         </div>
                         <h2 className="text-2xl font-bold text-slate-100 mb-3">
