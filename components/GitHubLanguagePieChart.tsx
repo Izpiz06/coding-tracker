@@ -3,16 +3,45 @@
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import type { GitHubLanguageDatum } from '../lib/github';
 
-const COLORS = [
-  '#58a6ff',
-  '#39d353',
-  '#f0883e',
-  '#a371f7',
-  '#ff7b72',
-  '#79c0ff',
-  '#56d364',
-  '#ffa657',
-];
+const KNOWN_COLORS: Record<string, string> = {
+  'TypeScript': '#0ea5e9',
+  'JavaScript': '#f59e0b',
+  'Python': '#eab308',
+  'Java': '#ef4444',
+  'C++': '#3b82f6',
+  'C': '#a3a3a3',
+  'C#': '#68217a',
+  'Go': '#00add8',
+  'Rust': '#dea584',
+  'Ruby': '#cc342d',
+  'Swift': '#f05138',
+  'Kotlin': '#7f52ff',
+  'Scala': '#dc322f',
+  'PHP': '#777bb4',
+  'Dart': '#0175c2',
+  'Haskell': '#5e5086',
+  'Lua': '#000080',
+  'Shell': '#4eaa25',
+  'HTML': '#e34c26',
+  'CSS': '#563d7c',
+  'SCSS': '#c6538c',
+  'Vue': '#41b883',
+  'Svelte': '#ff3e00',
+  'Jupyter Notebook': '#da5b0b',
+  'R': '#276dc3',
+  'Elixir': '#6e4a7e',
+  'Zig': '#f7a41d',
+  'Nix': '#7ebae4',
+  'Dockerfile': '#384d54',
+  'Makefile': '#427819',
+};
+const EXTRA_COLORS = ['#58a6ff', '#39d353', '#f0883e', '#a371f7', '#ff7b72', '#79c0ff', '#56d364', '#ffa657'];
+let extraIdx = 0;
+
+function getColor(name: string): string {
+  if (KNOWN_COLORS[name]) return KNOWN_COLORS[name];
+  return EXTRA_COLORS[extraIdx++ % EXTRA_COLORS.length];
+}
 
 export default function GitHubLanguagePieChart({
   data,
@@ -47,7 +76,7 @@ export default function GitHubLanguagePieChart({
             stroke="none"
           >
             {data.map((entry, index) => (
-              <Cell key={`${entry.name}-${index}`} fill={COLORS[index % COLORS.length]} />
+              <Cell key={`${entry.name}-${index}`} fill={getColor(entry.name)} />
             ))}
           </Pie>
           <Tooltip

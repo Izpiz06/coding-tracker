@@ -13,16 +13,49 @@ interface LanguageDatum {
 }
 
 function normalizeLanguage(rawLanguage?: string | null): string {
-  const lang = rawLanguage || 'Unknown';
-  const lower = lang.toLowerCase();
+  if (!rawLanguage || rawLanguage === 'Unknown') return 'Unknown';
+  const lower = rawLanguage.toLowerCase().trim();
 
-  if (lower.includes('javascript')) return 'JavaScript';
-  if (lower.includes('typescript')) return 'TypeScript';
-  if (lower.includes('c++') || lower.includes('cpp')) return 'C++';
-  if (lower.includes('python')) return 'Python';
-  if (lower.includes('java')) return 'Java';
+  // Map common API strings to clean display names
+  const langMap: [string, string][] = [
+    ['python3', 'Python'], ['python', 'Python'], ['pypy3', 'Python'], ['pypy', 'Python'],
+    ['cpp', 'C++'], ['c++', 'C++'], ['gnu c++', 'C++'],
+    ['c#', 'C#'], ['csharp', 'C#'],
+    ['javascript', 'JavaScript'], ['nodejs', 'JavaScript'],
+    ['typescript', 'TypeScript'],
+    ['java', 'Java'],
+    ['golang', 'Go'], [' go', 'Go'],
+    ['rust', 'Rust'],
+    ['ruby', 'Ruby'],
+    ['swift', 'Swift'],
+    ['kotlin', 'Kotlin'],
+    ['scala', 'Scala'],
+    ['php', 'PHP'],
+    ['dart', 'Dart'],
+    ['racket', 'Racket'],
+    ['erlang', 'Erlang'],
+    ['elixir', 'Elixir'],
+    ['haskell', 'Haskell'],
+    ['lua', 'Lua'],
+    ['perl', 'Perl'],
+    ['r ', 'R'], ['rlang', 'R'],
+    ['mysql', 'SQL'], ['mssql', 'SQL'], ['oraclesql', 'SQL'], ['postgresql', 'SQL'],
+    ['bash', 'Bash'],
+  ];
 
-  return lang;
+  for (const [pattern, name] of langMap) {
+    if (lower.includes(pattern)) return name;
+  }
+
+  // Special case: exact match "c" (not c++/c#)
+  if (lower === 'c' || lower === 'gnu c') return 'C';
+  // Special case: exact "go"
+  if (lower === 'go') return 'Go';
+  // Special case: exact "r"
+  if (lower === 'r') return 'R';
+
+  // Capitalize first letter for anything else
+  return rawLanguage.charAt(0).toUpperCase() + rawLanguage.slice(1);
 }
 
 export default function LanguagePieChart({
@@ -43,6 +76,7 @@ export default function LanguagePieChart({
 
     submissions.forEach((sub) => {
       const cleanLang = normalizeLanguage(sub.language);
+      if (cleanLang === 'Unknown') return; // skip unknowns
       languageCounts.set(cleanLang, (languageCounts.get(cleanLang) || 0) + 1);
     });
 
@@ -57,15 +91,36 @@ export default function LanguagePieChart({
     return null;
   }
 
-  // 3. Define a sleek color palette
-  const COLORS: Record<string, string> = {
-    'C++': '#3b82f6',    // Blue
-    'Python': '#eab308', // Yellow
-    'Java': '#ef4444',   // Red
+  // Dynamic color palette — known languages get branded colors, rest cycle through extras
+  const KNOWN_COLORS: Record<string, string> = {
+    'C++': '#3b82f6',
+    'C': '#a3a3a3',
+    'C#': '#68217a',
+    'Python': '#eab308',
+    'Java': '#ef4444',
     'JavaScript': '#f59e0b',
     'TypeScript': '#0ea5e9',
-    'Unknown': '#737373',
+    'Go': '#00add8',
+    'Rust': '#dea584',
+    'Ruby': '#cc342d',
+    'Swift': '#f05138',
+    'Kotlin': '#7f52ff',
+    'Scala': '#dc322f',
+    'PHP': '#777bb4',
+    'Dart': '#0175c2',
+    'Haskell': '#5e5086',
+    'Lua': '#000080',
+    'SQL': '#e38c00',
+    'Bash': '#4eaa25',
+    'R': '#276dc3',
   };
+  const EXTRA_COLORS = ['#10b981', '#8b5cf6', '#ec4899', '#14b8a6', '#f472b6', '#6366f1', '#84cc16', '#fb923c'];
+  let extraIdx = 0;
+
+  function getColor(name: string): string {
+    if (KNOWN_COLORS[name]) return KNOWN_COLORS[name];
+    return EXTRA_COLORS[extraIdx++ % EXTRA_COLORS.length];
+  }
 
   return (
     <div className="h-64 w-full bg-neutral-900 border border-neutral-800 rounded-xl p-4 shadow-xl flex flex-col">
@@ -88,7 +143,7 @@ export default function LanguagePieChart({
               {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={COLORS[entry.name] || '#10b981'} // Default to emerald green if not mapped
+                  fill={getColor(entry.name)}
                 />
               ))}
             </Pie>
