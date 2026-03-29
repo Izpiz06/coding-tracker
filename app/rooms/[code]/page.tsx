@@ -54,6 +54,7 @@ interface LeaderboardEntry {
         codeforces: { total: number; rating: number; maxRating: number; rank: string | null } | null;
     };
     periodSubmissions: { leetcode: number; codeforces: number; total: number };
+    languageData?: { name: string; value: number }[];
     submissions: Submission[];
 }
 
@@ -453,7 +454,7 @@ export default function RoomDashboard({
 
                                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-4">
                                         <div className="bg-zinc-900/60 border border-zinc-700/60 rounded-xl p-3">
-                                            <LanguagePieChart submissions={entry.submissions} />
+                                            <LanguagePieChart submissions={entry.submissions} languageData={entry.languageData} />
                                         </div>
                                         <div className="bg-zinc-900/60 border border-zinc-700/60 rounded-xl p-3">
                                             <TopicRadarChart submissions={entry.submissions} />

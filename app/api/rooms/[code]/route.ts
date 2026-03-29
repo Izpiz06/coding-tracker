@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import { calculateScore, calculateDelta } from '../../../../lib/scoring';
 import { getCurrentUser } from '../../../../lib/auth';
+import { getLanguageDistributionForUser } from '../../../../lib/languageDistribution';
 
 /**
  * Get the start of the current competition period.
@@ -84,7 +85,7 @@ export async function GET(
         }
 
         // Build leaderboard
-        const leaderboard = room.members.map((member) => {
+        const leaderboard = await Promise.all(room.members.map(async (member) => {
             const user = member.user;
 
             // Get latest snapshots per platform
@@ -115,6 +116,15 @@ export async function GET(
                 (a) => a.userId === user.id
             );
             const delta24h = calculateDelta(userActivities);
+
+            const languageData = await getLanguageDistributionForUser({
+                leetcodeHandle: user.leetcodeHandle,
+                codeforcesHandle: user.codeforcesHandle,
+                fallbackSubmissions: user.submissions.map((sub) => ({
+                    platform: sub.platform,
+                    language: sub.language,
+                })),
+            });
 
             return {
                 userId: user.id,
@@ -149,9 +159,10 @@ export async function GET(
                     codeforces: cfInPeriod.length,
                     total: periodSubmissions.length,
                 },
+                languageData,
                 submissions: user.submissions,
             };
-        });
+        }));
 
         // Sort by total score descending
         leaderboard.sort((a, b) => b.score - a.score);

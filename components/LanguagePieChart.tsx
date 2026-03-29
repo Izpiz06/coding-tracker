@@ -7,28 +7,50 @@ interface Submission {
   language?: string | null;
 }
 
-export default function LanguagePieChart({ submissions }: { submissions: Submission[] }) {
-  // 1. Group the submissions by language and count them
-  const languageCounts = new Map<string, number>();
+interface LanguageDatum {
+  name: string;
+  value: number;
+}
 
-  submissions.forEach((sub) => {
-    // Some platforms return null or weird strings, let's clean it up a bit
-    const lang = sub.language || 'Unknown';
+function normalizeLanguage(rawLanguage?: string | null): string {
+  const lang = rawLanguage || 'Unknown';
+  const lower = lang.toLowerCase();
 
-    // Group variations of languages together (e.g., "GNU C++17" -> "C++")
-    let cleanLang = lang;
-    if (lang.toLowerCase().includes('c++') || lang.toLowerCase().includes('cpp')) cleanLang = 'C++';
-    if (lang.toLowerCase().includes('python')) cleanLang = 'Python';
-    if (lang.toLowerCase().includes('java') && !lang.toLowerCase().includes('javascript')) cleanLang = 'Java';
+  if (lower.includes('javascript')) return 'JavaScript';
+  if (lower.includes('typescript')) return 'TypeScript';
+  if (lower.includes('c++') || lower.includes('cpp')) return 'C++';
+  if (lower.includes('python')) return 'Python';
+  if (lower.includes('java')) return 'Java';
 
-    languageCounts.set(cleanLang, (languageCounts.get(cleanLang) || 0) + 1);
-  });
+  return lang;
+}
 
-  // 2. Convert to an array for Recharts
-  const data = Array.from(languageCounts.entries()).map(([name, value]) => ({
-    name,
-    value,
-  }));
+export default function LanguagePieChart({
+  submissions = [],
+  languageData,
+}: {
+  submissions?: Submission[];
+  languageData?: LanguageDatum[];
+}) {
+  // Prefer precomputed distribution from coding platform APIs when available.
+  let data: LanguageDatum[];
+
+  if (languageData && languageData.length > 0) {
+    data = languageData;
+  } else {
+    // Group fallback submission records by language.
+    const languageCounts = new Map<string, number>();
+
+    submissions.forEach((sub) => {
+      const cleanLang = normalizeLanguage(sub.language);
+      languageCounts.set(cleanLang, (languageCounts.get(cleanLang) || 0) + 1);
+    });
+
+    data = Array.from(languageCounts.entries()).map(([name, value]) => ({
+      name,
+      value,
+    }));
+  }
 
   // If no submissions exist, don't render a broken chart
   if (data.length === 0) {
