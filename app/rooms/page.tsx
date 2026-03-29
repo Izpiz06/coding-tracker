@@ -128,12 +128,20 @@ export default function RoomsHubPage() {
                 Create a room, join by code, and track leaderboard progress together.
               </p>
             </div>
-            <Link
-              href="/rooms/join"
-              className="btn-ghost px-4 py-2 text-sm"
-            >
-              Join With Code
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/"
+                className="btn-ghost px-4 py-2 text-sm"
+              >
+                Back Home
+              </Link>
+              <Link
+                href="/rooms/join"
+                className="btn-ghost px-4 py-2 text-sm"
+              >
+                Join With Code
+              </Link>
+            </div>
           </div>
         </div>
 

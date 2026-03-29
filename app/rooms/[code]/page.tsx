@@ -1,12 +1,14 @@
 // app/rooms/[code]/page.tsx — Room Dashboard
 'use client';
 
+import Link from 'next/link';
 import { useState, useEffect, use } from 'react';
 import ActivityHeatmap from '../../../components/ActivityHeatmap';
 import LanguagePieChart from '../../../components/LanguagePieChart';
 import TopicRadarChart from '../../../components/TopicRadarChart';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import {
+    RiArrowLeftLine,
     RiArrowDownLine,
     RiArrowUpLine,
     RiBarChartBoxLine,
@@ -229,6 +231,13 @@ export default function RoomDashboard({
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
+                            <Link
+                                href="/rooms"
+                                className="btn-ghost inline-flex items-center gap-2 px-4 py-2 text-sm"
+                            >
+                                <RiArrowLeftLine className="text-zinc-300" />
+                                Back
+                            </Link>
                             <button
                                 onClick={copyInviteLink}
                                 className="btn-ghost inline-flex items-center gap-2 px-4 py-2 text-sm"
