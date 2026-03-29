@@ -432,19 +432,19 @@ export default function RoomDashboard({
                                     <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-5">
                                         <div className="bg-zinc-900/50 rounded-lg p-2 text-center border border-zinc-700/40">
                                             <div className="text-xs text-zinc-400 uppercase tracking-wider mb-1">LC Easy</div>
-                                            <div className="text-base font-bold text-zinc-200">{entry.breakdown.lcEasy}</div>
+                                            <div className="text-base font-bold text-zinc-200">{entry.stats.leetcode?.easy ?? 0}</div>
                                         </div>
                                         <div className="bg-zinc-900/50 rounded-lg p-2 text-center border border-zinc-700/40">
                                             <div className="text-xs text-zinc-400 uppercase tracking-wider mb-1">LC Medium</div>
-                                            <div className="text-base font-bold text-zinc-200">{entry.breakdown.lcMedium}</div>
+                                            <div className="text-base font-bold text-zinc-200">{entry.stats.leetcode?.medium ?? 0}</div>
                                         </div>
                                         <div className="bg-zinc-900/50 rounded-lg p-2 text-center border border-zinc-700/40">
                                             <div className="text-xs text-zinc-400 uppercase tracking-wider mb-1">LC Hard</div>
-                                            <div className="text-base font-bold text-zinc-200">{entry.breakdown.lcHard}</div>
+                                            <div className="text-base font-bold text-zinc-200">{entry.stats.leetcode?.hard ?? 0}</div>
                                         </div>
                                         <div className="bg-zinc-900/50 rounded-lg p-2 text-center border border-zinc-700/40">
                                             <div className="text-xs text-zinc-400 uppercase tracking-wider mb-1">CF Problems</div>
-                                            <div className="text-base font-bold text-zinc-200">{entry.breakdown.cfProblems}</div>
+                                            <div className="text-base font-bold text-zinc-200">{entry.stats.codeforces?.total ?? 0}</div>
                                         </div>
                                         <div className="bg-zinc-900/50 rounded-lg p-2 text-center border border-zinc-700/40">
                                             <div className="text-xs text-zinc-400 uppercase tracking-wider mb-1">24h Delta</div>
