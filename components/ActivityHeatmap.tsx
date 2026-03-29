@@ -79,7 +79,7 @@ export default function ActivityHeatmap({ submissions }: { submissions: Submissi
         </h3>
         <div className="text-right">
           <div className="text-xs text-neutral-500 uppercase tracking-widest mb-1">Current Streak</div>
-          <div className="text-2xl font-black text-emerald-400">🔥 {currentStreak} Days</div>
+          <div className="text-2xl font-black text-emerald-400">{currentStreak} Days</div>
         </div>
       </div>
 

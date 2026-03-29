@@ -6,6 +6,22 @@ import ActivityHeatmap from '../../../components/ActivityHeatmap';
 import LanguagePieChart from '../../../components/LanguagePieChart';
 import TopicRadarChart from '../../../components/TopicRadarChart';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import {
+    RiArrowDownLine,
+    RiArrowUpLine,
+    RiBarChartBoxLine,
+    RiCalendarEventLine,
+    RiCheckboxCircleLine,
+    RiCloseLine,
+    RiGroupLine,
+    RiMedalLine,
+    RiRefreshLine,
+    RiShareForwardLine,
+    RiShieldUserLine,
+    RiSwordLine,
+    RiTrophyLine,
+    RiUser3Line,
+} from 'react-icons/ri';
 
 interface Submission {
     id: number;
@@ -55,21 +71,36 @@ interface RoomData {
 }
 
 function getRankBadge(rank: number) {
-    switch (rank) {
-        case 1: return '🥇';
-        case 2: return '🥈';
-        case 3: return '🥉';
-        default: return `#${rank}`;
-    }
+    const medalTone =
+        rank === 1 ? 'text-amber-300' : rank === 2 ? 'text-slate-300' : rank === 3 ? 'text-orange-300' : 'text-slate-500';
+
+    return (
+        <span className="inline-flex items-center gap-1">
+            {rank <= 3 ? <RiMedalLine className={`text-lg ${medalTone}`} /> : <RiUser3Line className="text-base text-slate-500" />}
+            <span className="text-xs font-semibold text-slate-300">#{rank}</span>
+        </span>
+    );
 }
 
 function getDeltaDisplay(delta: number) {
-    if (delta > 0) return <span className="text-emerald-400 font-bold">↑ +{delta}</span>;
-    if (delta < 0) return <span className="text-red-400 font-bold">↓ {delta}</span>;
-    return <span className="text-neutral-500">—</span>;
+    if (delta > 0) {
+        return (
+            <span className="inline-flex items-center gap-1 text-emerald-300 font-semibold">
+                <RiArrowUpLine className="text-sm" />+{delta}
+            </span>
+        );
+    }
+    if (delta < 0) {
+        return (
+            <span className="inline-flex items-center gap-1 text-rose-300 font-semibold">
+                <RiArrowDownLine className="text-sm" />{delta}
+            </span>
+        );
+    }
+    return <span className="text-slate-500">0</span>;
 }
 
-const SCORE_COLORS = ['#10b981', '#06b6d4', '#f59e0b', '#ef4444', '#8b5cf6', '#22c55e', '#f97316', '#3b82f6'];
+const SCORE_COLORS = ['#38bdf8', '#22d3ee', '#34d399', '#818cf8', '#f59e0b', '#fb7185', '#a78bfa', '#06b6d4'];
 
 export default function RoomDashboard({
     params,
@@ -81,6 +112,7 @@ export default function RoomDashboard({
     const [error, setError] = useState('');
     const [syncing, setSyncing] = useState(false);
     const [syncMessage, setSyncMessage] = useState('');
+    const [syncError, setSyncError] = useState(false);
     const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
     const [showInvite, setShowInvite] = useState(false);
 
@@ -97,6 +129,7 @@ export default function RoomDashboard({
     async function handleSync() {
         setSyncing(true);
         setSyncMessage('');
+        setSyncError(false);
         const passcode = prompt('Enter admin passcode to sync:');
         if (!passcode) {
             setSyncing(false);
@@ -111,16 +144,18 @@ export default function RoomDashboard({
             });
             const result = await res.json();
             if (!res.ok) {
+                setSyncError(true);
                 setSyncMessage(result.error || 'Sync failed');
             } else {
                 setSyncMessage(
-                    `✅ Synced ${result.membersSynced} members, ${result.activitiesCreated} new activities`
+                    `Synced ${result.membersSynced} members, ${result.activitiesCreated} new activities`
                 );
                 // Refresh data
                 const refreshed = await fetch(`/api/rooms/${code}`).then((r) => r.json());
                 if (!refreshed.error) setData(refreshed);
             }
         } catch {
+            setSyncError(true);
             setSyncMessage('Network error');
         } finally {
             setSyncing(false);
@@ -136,7 +171,7 @@ export default function RoomDashboard({
 
     if (error) {
         return (
-            <div className="min-h-screen bg-neutral-950 flex items-center justify-center text-red-400 text-lg">
+            <div className="min-h-screen bg-[#060a12] flex items-center justify-center text-rose-300 text-lg">
                 {error}
             </div>
         );
@@ -144,8 +179,8 @@ export default function RoomDashboard({
 
     if (!data) {
         return (
-            <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
-                <div className="text-neutral-500 text-lg animate-pulse">Loading room...</div>
+            <div className="min-h-screen bg-[#060a12] flex items-center justify-center">
+                <div className="text-slate-400 text-lg animate-pulse">Loading room...</div>
             </div>
         );
     }
@@ -171,49 +206,52 @@ export default function RoomDashboard({
     }
 
     return (
-        <main className="min-h-screen bg-neutral-950 text-neutral-50 p-4 md:p-8">
-            <div className="max-w-7xl mx-auto">
+        <main className="relative min-h-screen overflow-hidden bg-[#060a12] text-slate-100 p-4 md:p-8">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(56,189,248,0.16)_1px,transparent_0)] [background-size:22px_22px] opacity-40" />
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(14,116,144,0.2)_0%,rgba(15,23,42,0.75)_46%,rgba(6,10,18,0.95)_100%)]" />
+
+            <div className="relative max-w-7xl mx-auto">
 
                 {/* ═══ Room Header ═══ */}
-                <div className="bg-neutral-900/50 border border-neutral-800 rounded-2xl p-6 mb-8 backdrop-blur-sm">
+                <div className="bg-slate-900/70 border border-slate-700/60 rounded-2xl p-6 mb-8 backdrop-blur-md shadow-[0_20px_70px_-40px_rgba(56,189,248,0.45)]">
                     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                         <div>
                             <div className="flex items-center gap-3 mb-2">
-                                <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                                <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-sky-300 to-indigo-300 bg-clip-text text-transparent">
                                     {room.name}
                                 </h1>
-                                <span className="px-3 py-1 bg-neutral-800 border border-neutral-700 rounded-full text-xs text-neutral-400 font-mono">
+                                <span className="px-3 py-1 bg-slate-800/80 border border-slate-600/60 rounded-full text-xs text-slate-300 font-mono">
                                     {room.joinCode}
                                 </span>
                             </div>
-                            <div className="flex items-center gap-4 text-sm text-neutral-400">
-                                <span>👥 {room.memberCount} members</span>
-                                <span>•</span>
-                                <span>📅 {room.periodMode.toLowerCase()} reset</span>
-                                <span>•</span>
-                                <span>Created by {room.createdBy}</span>
+                            <div className="flex flex-wrap items-center gap-4 text-sm text-slate-400">
+                                <span className="inline-flex items-center gap-1.5"><RiGroupLine className="text-sky-300" /> {room.memberCount} members</span>
+                                <span className="inline-flex items-center gap-1.5"><RiCalendarEventLine className="text-sky-300" /> {room.periodMode.toLowerCase()} reset</span>
+                                <span className="inline-flex items-center gap-1.5"><RiShieldUserLine className="text-sky-300" /> {room.createdBy}</span>
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
                             <button
                                 onClick={copyInviteLink}
-                                className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 rounded-lg text-sm font-bold transition-all"
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800/90 hover:bg-slate-700 border border-slate-600/70 rounded-lg text-sm font-semibold transition-all"
                             >
-                                {showInvite ? '✅ Copied!' : '🔗 Invite'}
+                                {showInvite ? <RiCheckboxCircleLine className="text-emerald-300" /> : <RiShareForwardLine className="text-sky-300" />}
+                                {showInvite ? 'Copied' : 'Invite'}
                             </button>
                             <button
                                 onClick={handleSync}
                                 disabled={syncing}
-                                className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-bold rounded-lg text-sm transition-all disabled:opacity-50 shadow-lg shadow-emerald-900/30"
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-sky-600 to-indigo-500 hover:from-sky-500 hover:to-indigo-400 text-white font-semibold rounded-lg text-sm transition-all disabled:opacity-50 shadow-lg shadow-sky-900/30"
                             >
-                                {syncing ? '⏳ Syncing...' : '🔄 Sync Room'}
+                                <RiRefreshLine className={syncing ? 'animate-spin' : ''} />
+                                {syncing ? 'Syncing...' : 'Sync Room'}
                             </button>
                         </div>
                     </div>
                     {syncMessage && (
-                        <div className={`mt-4 text-sm p-3 rounded-lg ${syncMessage.includes('✅')
-                                ? 'bg-green-900/30 text-green-400 border border-green-800/50'
-                                : 'bg-red-900/30 text-red-400 border border-red-800/50'
+                        <div className={`mt-4 text-sm p-3 rounded-lg ${syncError
+                                ? 'bg-rose-900/25 text-rose-300 border border-rose-700/50'
+                                : 'bg-emerald-900/25 text-emerald-300 border border-emerald-700/50'
                             }`}>
                             {syncMessage}
                         </div>
@@ -225,22 +263,22 @@ export default function RoomDashboard({
 
                     {/* Leaderboard — 2/3 width */}
                     <div className="lg:col-span-2">
-                        <div className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden shadow-xl">
-                            <div className="px-6 py-4 border-b border-neutral-800 bg-neutral-900/80">
-                                <h2 className="text-lg font-bold text-neutral-200 uppercase tracking-widest text-sm">
-                                    🏆 Leaderboard
+                        <div className="bg-slate-900/80 border border-slate-700/60 rounded-xl overflow-hidden shadow-[0_20px_70px_-40px_rgba(56,189,248,0.45)]">
+                            <div className="px-6 py-4 border-b border-slate-700/60 bg-slate-900/90">
+                                <h2 className="inline-flex items-center gap-2 text-sm font-bold text-slate-200 uppercase tracking-[0.15em]">
+                                    <RiTrophyLine className="text-sky-300" /> Leaderboard
                                 </h2>
                             </div>
 
-                            <div className="divide-y divide-neutral-800/50">
+                            <div className="divide-y divide-slate-700/40">
                                 {leaderboard.map((entry) => (
                                     <div
                                         key={entry.userId}
                                         onClick={() => toggleComparison(entry.userId)}
-                                        className={`flex items-center gap-4 px-6 py-4 hover:bg-neutral-800/30 cursor-pointer transition-all ${selectedUsers.includes(entry.userId)
-                                                ? 'bg-emerald-900/10 border-l-2 border-emerald-500'
+                                        className={`flex items-center gap-4 px-6 py-4 hover:bg-slate-800/30 cursor-pointer transition-all ${selectedUsers.includes(entry.userId)
+                                                ? 'bg-sky-900/20 border-l-2 border-sky-400'
                                                 : ''
-                                            } ${entry.rank === 1 ? 'bg-gradient-to-r from-yellow-900/10 to-transparent' : ''}`}
+                                            } ${entry.rank === 1 ? 'bg-gradient-to-r from-sky-900/30 to-transparent' : ''}`}
                                     >
                                         {/* Rank */}
                                         <div className="text-2xl w-12 text-center">
@@ -252,24 +290,24 @@ export default function RoomDashboard({
                                             <div className="flex items-center gap-2">
                                                 <span className="font-bold text-lg">{entry.name}</span>
                                                 {selectedUsers.includes(entry.userId) && (
-                                                    <span className="text-xs px-2 py-0.5 bg-cyan-900/40 text-cyan-300 rounded-full border border-cyan-700/40">
+                                                    <span className="text-xs px-2 py-0.5 bg-sky-900/50 text-sky-300 rounded-full border border-sky-700/40">
                                                         COMPARE
                                                     </span>
                                                 )}
                                                 {entry.role === 'OWNER' && (
-                                                    <span className="text-xs px-2 py-0.5 bg-amber-900/30 text-amber-400 rounded-full border border-amber-800/50">
+                                                    <span className="text-xs px-2 py-0.5 bg-indigo-900/30 text-indigo-300 rounded-full border border-indigo-700/50">
                                                         OWNER
                                                     </span>
                                                 )}
                                             </div>
-                                            <div className="flex items-center gap-3 mt-1 text-xs text-neutral-500">
+                                            <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
                                                 {entry.stats.leetcode && (
-                                                    <span className="text-orange-400/70">
+                                                    <span className="text-amber-300/80">
                                                         LC: {entry.stats.leetcode.total} solved
                                                     </span>
                                                 )}
                                                 {entry.stats.codeforces && (
-                                                    <span className="text-blue-400/70">
+                                                    <span className="text-sky-300/80">
                                                         CF: {entry.stats.codeforces.total} solved • {entry.stats.codeforces.rating} rating
                                                     </span>
                                                 )}
@@ -278,16 +316,16 @@ export default function RoomDashboard({
 
                                         {/* Delta */}
                                         <div className="text-center px-4">
-                                            <div className="text-xs text-neutral-500 mb-1">24h</div>
+                                            <div className="text-xs text-slate-500 mb-1">24h</div>
                                             {getDeltaDisplay(entry.delta24h)}
                                         </div>
 
                                         {/* Score */}
                                         <div className="text-right min-w-[80px]">
-                                            <div className="text-2xl font-black bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                                            <div className="text-2xl font-black bg-gradient-to-r from-sky-300 to-indigo-300 bg-clip-text text-transparent">
                                                 {entry.score}
                                             </div>
-                                            <div className="text-xs text-neutral-500">pts</div>
+                                            <div className="text-xs text-slate-500">pts</div>
                                         </div>
                                     </div>
                                 ))}
@@ -297,34 +335,34 @@ export default function RoomDashboard({
 
                     {/* Competitive Snapshot — 1/3 width */}
                     <div>
-                        <div className="bg-neutral-900 border border-neutral-800 rounded-xl shadow-xl">
-                            <div className="px-6 py-4 border-b border-neutral-800">
-                                <h2 className="text-lg font-bold text-neutral-200 uppercase tracking-widest text-sm">
-                                    🎯 Comparison Setup
+                        <div className="bg-slate-900/80 border border-slate-700/60 rounded-xl shadow-[0_20px_70px_-40px_rgba(56,189,248,0.45)]">
+                            <div className="px-6 py-4 border-b border-slate-700/60">
+                                <h2 className="inline-flex items-center gap-2 text-sm font-bold text-slate-200 uppercase tracking-[0.15em]">
+                                    <RiBarChartBoxLine className="text-sky-300" /> Comparison Setup
                                 </h2>
                             </div>
                             <div className="p-4">
-                                <p className="text-xs text-neutral-400 mb-3">
+                                <p className="text-xs text-slate-400 mb-3 leading-relaxed">
                                     Click up to 2 members in the leaderboard to compare language mix, topics, and solve consistency.
                                 </p>
-                                <div className="bg-neutral-800/40 border border-neutral-700/50 rounded-lg p-3 mb-4">
-                                    <div className="text-xs text-neutral-500 uppercase tracking-wider mb-2">Selected</div>
+                                <div className="bg-slate-800/40 border border-slate-700/50 rounded-lg p-3 mb-4">
+                                    <div className="text-xs text-slate-500 uppercase tracking-[0.15em] mb-2">Selected</div>
                                     {selectedEntries.length === 0 ? (
-                                        <div className="text-sm text-neutral-500">No member selected yet</div>
+                                        <div className="text-sm text-slate-500">No member selected yet</div>
                                     ) : (
                                         <div className="space-y-2">
                                             {selectedEntries.map((entry) => (
                                                 <div key={entry.userId} className="flex items-center justify-between text-sm">
-                                                    <span className="font-semibold text-neutral-200">{entry.name}</span>
-                                                    <span className="text-emerald-400 font-bold">{entry.score} pts</span>
+                                                    <span className="font-semibold text-slate-200">{entry.name}</span>
+                                                    <span className="text-sky-300 font-bold">{entry.score} pts</span>
                                                 </div>
                                             ))}
                                         </div>
                                     )}
                                 </div>
 
-                                <div className="h-56 bg-neutral-900 border border-neutral-800 rounded-lg p-3">
-                                    <div className="text-xs text-neutral-500 uppercase tracking-wider mb-2">Score Share</div>
+                                <div className="h-56 bg-slate-900/80 border border-slate-700/60 rounded-lg p-3">
+                                    <div className="text-xs text-slate-500 uppercase tracking-[0.15em] mb-2">Score Share</div>
                                     <ResponsiveContainer width="100%" height="90%">
                                         <PieChart>
                                             <Pie
@@ -341,7 +379,7 @@ export default function RoomDashboard({
                                                 ))}
                                             </Pie>
                                             <Tooltip
-                                                contentStyle={{ backgroundColor: '#171717', borderColor: '#262626', borderRadius: '8px' }}
+                                                contentStyle={{ backgroundColor: '#111827', borderColor: '#334155', borderRadius: '8px' }}
                                                 itemStyle={{ color: '#fff' }}
                                             />
                                         </PieChart>
@@ -353,84 +391,86 @@ export default function RoomDashboard({
                 </div>
 
                 {/* ═══ Collective Heatmap ═══ */}
-                <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-xl mb-8">
-                    <h2 className="text-sm font-bold text-neutral-400 uppercase tracking-widest mb-4">
-                        🔥 Team Activity Heatmap
+                <div className="bg-slate-900/80 border border-slate-700/60 rounded-xl p-6 shadow-[0_20px_70px_-40px_rgba(56,189,248,0.45)] mb-8">
+                    <h2 className="inline-flex items-center gap-2 text-sm font-bold text-slate-300 uppercase tracking-[0.15em] mb-4">
+                        <RiBarChartBoxLine className="text-sky-300" /> Team Activity Heatmap
                     </h2>
                     <ActivityHeatmap submissions={allSubmissions} />
                 </div>
 
                 {/* ═══ Member Comparison View ═══ */}
                 {selectedEntries.length > 0 && (
-                    <div className="bg-neutral-900 border border-emerald-800/30 rounded-xl p-6 shadow-xl mb-8">
+                    <div className="bg-slate-900/80 border border-slate-700/60 rounded-xl p-6 shadow-[0_20px_70px_-40px_rgba(56,189,248,0.45)] mb-8">
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-sm font-bold text-neutral-400 uppercase tracking-widest">
-                                ⚔️ {selectedEntries.length === 2
+                            <h2 className="inline-flex items-center gap-2 text-sm font-bold text-slate-300 uppercase tracking-[0.15em]">
+                                <RiSwordLine className="text-sky-300" />
+                                {selectedEntries.length === 2
                                     ? `${selectedEntries[0].name} vs ${selectedEntries[1].name}`
                                     : `${selectedEntries[0].name} Performance Profile`}
                             </h2>
                             <button
                                 onClick={() => setSelectedUsers([])}
-                                className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors"
+                                className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-300 transition-colors"
                             >
+                                <RiCloseLine />
                                 Clear
                             </button>
                         </div>
 
                         <div className={`grid grid-cols-1 ${selectedEntries.length === 2 ? 'xl:grid-cols-2' : ''} gap-6`}>
                             {selectedEntries.map((entry) => (
-                                <section key={entry.userId} className="bg-neutral-950/60 border border-neutral-800 rounded-xl p-4">
+                                <section key={entry.userId} className="bg-slate-950/60 border border-slate-700/60 rounded-xl p-4">
                                     <div className="flex items-center justify-between mb-4">
                                         <div>
-                                            <h3 className="text-lg font-bold text-neutral-100">{entry.name}</h3>
-                                            <p className="text-xs text-neutral-500">Rank #{entry.rank} • {entry.periodSubmissions.total} solves this period</p>
+                                            <h3 className="text-lg font-bold text-slate-100">{entry.name}</h3>
+                                            <p className="text-xs text-slate-500">Rank #{entry.rank} • {entry.periodSubmissions.total} solves this period</p>
                                         </div>
                                         <div className="text-right">
-                                            <div className="text-xl font-black text-emerald-400">{entry.score}</div>
-                                            <div className="text-xs text-neutral-500">score</div>
+                                            <div className="text-xl font-black text-sky-300">{entry.score}</div>
+                                            <div className="text-xs text-slate-500">score</div>
                                         </div>
                                     </div>
 
                                     <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-5">
-                                        <div className="bg-neutral-800/50 rounded-lg p-2 text-center">
-                                            <div className="text-xs text-green-400/70 uppercase tracking-wider mb-1">LC Easy</div>
-                                            <div className="text-base font-bold text-green-400">{entry.breakdown.lcEasy}</div>
+                                        <div className="bg-slate-800/50 rounded-lg p-2 text-center border border-slate-700/30">
+                                            <div className="text-xs text-emerald-300/70 uppercase tracking-wider mb-1">LC Easy</div>
+                                            <div className="text-base font-bold text-emerald-300">{entry.breakdown.lcEasy}</div>
                                         </div>
-                                        <div className="bg-neutral-800/50 rounded-lg p-2 text-center">
-                                            <div className="text-xs text-yellow-400/70 uppercase tracking-wider mb-1">LC Medium</div>
-                                            <div className="text-base font-bold text-yellow-400">{entry.breakdown.lcMedium}</div>
+                                        <div className="bg-slate-800/50 rounded-lg p-2 text-center border border-slate-700/30">
+                                            <div className="text-xs text-amber-300/70 uppercase tracking-wider mb-1">LC Medium</div>
+                                            <div className="text-base font-bold text-amber-300">{entry.breakdown.lcMedium}</div>
                                         </div>
-                                        <div className="bg-neutral-800/50 rounded-lg p-2 text-center">
-                                            <div className="text-xs text-red-400/70 uppercase tracking-wider mb-1">LC Hard</div>
-                                            <div className="text-base font-bold text-red-400">{entry.breakdown.lcHard}</div>
+                                        <div className="bg-slate-800/50 rounded-lg p-2 text-center border border-slate-700/30">
+                                            <div className="text-xs text-rose-300/70 uppercase tracking-wider mb-1">LC Hard</div>
+                                            <div className="text-base font-bold text-rose-300">{entry.breakdown.lcHard}</div>
                                         </div>
-                                        <div className="bg-neutral-800/50 rounded-lg p-2 text-center">
-                                            <div className="text-xs text-blue-400/70 uppercase tracking-wider mb-1">CF Problems</div>
-                                            <div className="text-base font-bold text-blue-400">{entry.breakdown.cfProblems}</div>
+                                        <div className="bg-slate-800/50 rounded-lg p-2 text-center border border-slate-700/30">
+                                            <div className="text-xs text-sky-300/70 uppercase tracking-wider mb-1">CF Problems</div>
+                                            <div className="text-base font-bold text-sky-300">{entry.breakdown.cfProblems}</div>
                                         </div>
-                                        <div className="bg-neutral-800/50 rounded-lg p-2 text-center">
-                                            <div className="text-xs text-purple-400/70 uppercase tracking-wider mb-1">24h Delta</div>
+                                        <div className="bg-slate-800/50 rounded-lg p-2 text-center border border-slate-700/30">
+                                            <div className="text-xs text-indigo-300/70 uppercase tracking-wider mb-1">24h Delta</div>
                                             <div className="text-base font-bold">{entry.delta24h > 0 ? `+${entry.delta24h}` : entry.delta24h}</div>
                                         </div>
                                     </div>
 
                                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-4">
-                                        <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-3">
+                                        <div className="bg-slate-900/70 border border-slate-700/60 rounded-xl p-3">
                                             <LanguagePieChart submissions={entry.submissions} />
                                         </div>
-                                        <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-3">
+                                        <div className="bg-slate-900/70 border border-slate-700/60 rounded-xl p-3">
                                             <TopicRadarChart submissions={entry.submissions} />
                                         </div>
                                     </div>
 
-                                    <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4">
+                                    <div className="bg-slate-900/70 border border-slate-700/60 rounded-xl p-4">
                                         <ActivityHeatmap submissions={entry.submissions} />
                                     </div>
                                 </section>
                             ))}
 
                             {selectedEntries.length === 1 && (
-                                <div className="bg-neutral-900/40 border border-dashed border-neutral-700 rounded-xl p-6 flex items-center justify-center text-center text-neutral-500 text-sm">
+                                <div className="bg-slate-900/40 border border-dashed border-slate-700 rounded-xl p-6 flex items-center justify-center text-center text-slate-500 text-sm">
                                     Select one more member from leaderboard to unlock side-by-side comparison.
                                 </div>
                             )}

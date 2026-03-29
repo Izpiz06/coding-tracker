@@ -39,12 +39,12 @@ export default function SyncButton() {
       <button 
         onClick={handleSync}
         disabled={loading}
-        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold text-sm transition-all disabled:opacity-50"
+        className="btn-primary px-4 py-2 text-sm disabled:opacity-50"
       >
         {loading ? 'Syncing Stats...' : 'Force Sync'}
       </button>
       {message && (
-        <p className={`text-xs ${message.startsWith('✓') ? 'text-emerald-400' : 'text-red-400'}`}>
+        <p className={`text-xs ${message.startsWith('✓') ? 'text-emerald-300' : 'text-rose-300'}`}>
           {message}
         </p>
       )}

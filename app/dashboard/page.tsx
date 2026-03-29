@@ -9,6 +9,7 @@ import LanguagePieChart from '../../components/LanguagePieChart';
 import TopicRadarChart from '../../components/TopicRadarChart';
 import LogoutButton from '../../components/LogoutButton';
 import { getCurrentUser } from '../../lib/auth';
+import { RiArrowLeftLine, RiBarChartLine, RiFireLine, RiLineChartLine, RiPieChart2Line } from 'react-icons/ri';
 
 export const revalidate = 0;
 
@@ -40,23 +41,23 @@ export default async function DashboardPage() {
   const latestCodeforces = user.snapshots.find(s => s.platform === 'CODEFORCES');
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-50 p-8">
-      <div className="max-w-6xl mx-auto">
+    <main className="site-shell text-slate-100">
+      <div className="site-container max-w-6xl">
 
         {/* Header */}
-        <div className="flex flex-col md:flex-row items-center justify-between mb-10 gap-4 bg-neutral-900/50 p-6 rounded-2xl border border-neutral-800">
+        <div className="panel flex flex-col md:flex-row items-center justify-between mb-10 gap-4 p-6">
           <div>
-            <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-              📊 Your Dashboard
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-100 inline-flex items-center gap-2">
+              <RiBarChartLine className="text-sky-300" /> Your Dashboard
             </h1>
-            <p className="text-sm text-neutral-400 mt-1">{user.name}</p>
+            <p className="text-sm text-slate-400 mt-1">{user.name}</p>
           </div>
           <div className="flex flex-wrap items-center gap-4">
             <Link
               href="/"
-              className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-white rounded-lg font-bold text-sm transition-all"
+              className="btn-ghost inline-flex items-center gap-1 px-4 py-2 text-sm"
             >
-              ← Back Home
+              <RiArrowLeftLine /> Back Home
             </Link>
             <SyncButton />
             <LogoutButton />
@@ -68,7 +69,7 @@ export default async function DashboardPage() {
 
           {/* LeetCode Card */}
           {latestLeetCode ? (
-            <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-xl">
+            <div className="panel p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-bold">LeetCode</h2>
                 <span className="text-3xl font-black text-orange-400">{latestLeetCode.totalSolved}</span>
@@ -89,14 +90,14 @@ export default async function DashboardPage() {
               </div>
             </div>
           ) : (
-            <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-xl text-neutral-500 italic">
+            <div className="panel p-6 text-slate-500 italic">
               No LeetCode data yet. Hit sync to get started!
             </div>
           )}
 
           {/* Codeforces Card */}
           {latestCodeforces ? (
-            <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-xl">
+            <div className="panel p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-bold">Codeforces</h2>
                 <span className="text-3xl font-black text-blue-400">{latestCodeforces.totalSolved}</span>
@@ -118,7 +119,7 @@ export default async function DashboardPage() {
               )}
             </div>
           ) : (
-            <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-xl text-neutral-500 italic">
+            <div className="panel p-6 text-slate-500 italic">
               No Codeforces data yet. Hit sync to get started!
             </div>
           )}
@@ -129,26 +130,26 @@ export default async function DashboardPage() {
         <div className="space-y-8">
 
           {/* Progress Chart */}
-          <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-xl">
-            <h3 className="text-xl font-bold mb-4">📈 Growth Over Time</h3>
+          <div className="panel p-6">
+            <h3 className="text-xl font-bold mb-4 inline-flex items-center gap-2"><RiLineChartLine className="text-sky-300" /> Growth Over Time</h3>
             <ProgressChart snapshots={user.snapshots} />
           </div>
 
           {/* Language & Topic Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-xl">
-              <h3 className="text-xl font-bold mb-4">💻 Languages</h3>
+            <div className="panel p-6">
+              <h3 className="text-xl font-bold mb-4 inline-flex items-center gap-2"><RiPieChart2Line className="text-sky-300" /> Languages</h3>
               <LanguagePieChart submissions={user.submissions} />
             </div>
-            <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-xl">
-              <h3 className="text-xl font-bold mb-4">🎯 Topics</h3>
+            <div className="panel p-6">
+              <h3 className="text-xl font-bold mb-4 inline-flex items-center gap-2"><RiPieChart2Line className="text-sky-300" /> Topics</h3>
               <TopicRadarChart submissions={user.submissions} />
             </div>
           </div>
 
           {/* Activity Heatmap */}
-          <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-xl">
-            <h3 className="text-xl font-bold mb-4">🔥 Activity Heatmap</h3>
+          <div className="panel p-6">
+            <h3 className="text-xl font-bold mb-4 inline-flex items-center gap-2"><RiFireLine className="text-sky-300" /> Activity Heatmap</h3>
             <ActivityHeatmap submissions={user.submissions} />
           </div>
 

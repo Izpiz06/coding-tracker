@@ -6,6 +6,7 @@ import LogoutButton from '../components/LogoutButton';
 import SyncButton from '../components/SyncButton';
 import { calculateScore } from '../lib/scoring';
 import { getCurrentUser, isProfileComplete } from '../lib/auth';
+import { RiBarChartLine, RiDoorLockBoxLine, RiGamepadLine, RiMedalLine, RiTeamLine, RiUserSettingsLine } from 'react-icons/ri';
 
 export const revalidate = 0;
 
@@ -83,35 +84,35 @@ export default async function Home() {
     .sort((a, b) => b.score - a.score);
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-50 p-8">
-      <div className="max-w-6xl mx-auto">
+    <main className="site-shell text-slate-100">
+      <div className="site-container max-w-6xl">
 
         {/* Header */}
-        <div className="flex flex-col md:flex-row items-center justify-between mb-10 gap-4 bg-neutral-900/50 p-6 rounded-2xl border border-neutral-800">
+        <div className="panel flex flex-col md:flex-row items-center justify-between mb-10 gap-4 p-6">
           <div>
-            <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-100">
               Coding Tracker
             </h1>
-            <p className="text-sm text-neutral-400 mt-1">Signed in as {currentUser.name}</p>
+            <p className="text-sm text-slate-400 mt-1">Signed in as {currentUser.name}</p>
           </div>
           <div className="flex flex-wrap items-center gap-4">
             <Link
               href="/dashboard"
-              className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-white rounded-lg font-bold text-sm transition-all"
+              className="btn-ghost inline-flex items-center gap-2 px-4 py-2 text-sm"
             >
-              📊 Dashboard
+              <RiBarChartLine className="text-sky-300" /> Dashboard
             </Link>
             <Link
               href="/problems"
-              className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-white rounded-lg font-bold text-sm transition-all"
+              className="btn-ghost px-4 py-2 text-sm"
             >
               Problems
             </Link>
             <Link
               href="/profile/setup"
-              className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-white rounded-lg font-bold text-sm transition-all"
+              className="btn-ghost inline-flex items-center gap-2 px-4 py-2 text-sm"
             >
-              Profile
+              <RiUserSettingsLine className="text-sky-300" /> Profile
             </Link>
             <SyncButton />
             <LogoutButton />
@@ -119,7 +120,7 @@ export default async function Home() {
         </div>
 
         {!profileComplete && (
-          <div className="mb-8 rounded-xl border border-amber-800/50 bg-amber-900/20 p-4 text-amber-300 text-sm">
+          <div className="mb-8 rounded-xl border border-amber-700/50 bg-amber-900/20 p-4 text-amber-300 text-sm">
             Complete your profile handles (LeetCode + Codeforces) before joining/creating rooms.
             <Link href="/profile/setup" className="ml-2 underline underline-offset-2">
               Complete profile
@@ -128,35 +129,35 @@ export default async function Home() {
         )}
 
         {/* Global Leaderboard */}
-        <div className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden shadow-xl mb-10">
-          <div className="px-6 py-4 border-b border-neutral-800 bg-neutral-900/80">
-            <h2 className="text-sm font-bold text-neutral-200 uppercase tracking-widest">🏆 Global Leaderboard</h2>
+        <div className="panel overflow-hidden mb-10">
+          <div className="px-6 py-4 border-b border-slate-700/50 bg-slate-900/70">
+            <h2 className="section-title inline-flex items-center gap-2"><RiMedalLine className="text-sky-300" /> Global Leaderboard</h2>
           </div>
-          <div className="divide-y divide-neutral-800/50">
+          <div className="divide-y divide-slate-700/40">
             {globalLeaderboard.map((entry, index) => (
-              <div key={entry.id} className="px-6 py-4 flex items-center justify-between gap-4 hover:bg-neutral-800/30 transition-colors">
+              <div key={entry.id} className="px-6 py-4 flex items-center justify-between gap-4 hover:bg-slate-800/25 transition-colors">
                 <div className="flex items-center gap-3">
-                  <span className="text-neutral-400 w-8 font-bold">#{index + 1}</span>
-                  <Link href={`/players/${entry.id}`} className="font-bold hover:text-emerald-400 transition-colors">
+                  <span className="text-slate-400 w-8 font-bold">#{index + 1}</span>
+                  <Link href={`/players/${entry.id}`} className="font-bold hover:text-sky-300 transition-colors">
                     {entry.name}
                   </Link>
                 </div>
-                <div className="text-sm text-neutral-400 hidden md:block">
+                <div className="text-sm text-slate-400 hidden md:block">
                   LC {entry.leetcodeTotal} • CF {entry.codeforcesTotal}
                 </div>
-                <div className="text-xl font-black text-emerald-400">{entry.score}</div>
+                <div className="text-xl font-black text-sky-300">{entry.score}</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* My Rooms Section */}
-        <div className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden shadow-xl">
-          <div className="px-6 py-4 border-b border-neutral-800 bg-neutral-900/80 flex items-center justify-between">
-            <h2 className="text-sm font-bold text-neutral-200 uppercase tracking-widest">🎮 My Rooms</h2>
+        <div className="panel overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-700/50 bg-slate-900/70 flex items-center justify-between">
+            <h2 className="section-title inline-flex items-center gap-2"><RiGamepadLine className="text-sky-300" /> My Rooms</h2>
             <Link
               href="/rooms"
-              className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-sm rounded font-semibold transition-all"
+              className="btn-primary px-3 py-1 text-sm"
             >
               Manage Rooms
             </Link>
@@ -164,38 +165,40 @@ export default async function Home() {
 
           {userRooms.length === 0 ? (
             <div className="px-6 py-12 text-center">
-              <p className="text-neutral-400 mb-4">No rooms yet. Create one to start competing!</p>
+              <p className="text-slate-400 mb-4">No rooms yet. Create one to start competing!</p>
               <Link
                 href="/rooms"
-                className="inline-block px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold transition-all"
+                className="btn-primary inline-flex items-center gap-2 px-6 py-3"
               >
+                <RiTeamLine className="text-sky-300" />
                 Create Your First Room
               </Link>
             </div>
           ) : (
-            <div className="divide-y divide-neutral-800/50">
+            <div className="divide-y divide-slate-700/40">
               {userRooms.map((room) => (
                 <Link
                   key={room.id}
                   href={`/rooms/${room.joinCode}`}
-                  className="px-6 py-4 flex items-center justify-between gap-4 hover:bg-neutral-800/50 transition-colors group"
+                  className="px-6 py-4 flex items-center justify-between gap-4 hover:bg-slate-800/30 transition-colors group"
                 >
                   <div className="flex-1">
-                    <h3 className="font-bold text-lg group-hover:text-emerald-400 transition-colors">
+                    <h3 className="font-bold text-lg group-hover:text-sky-300 transition-colors">
                       {room.name}
                     </h3>
-                    <p className="text-sm text-neutral-400">
-                      Code: <span className="font-mono bg-neutral-800 px-2 py-1 rounded">{room.joinCode}</span>
+                    <p className="text-sm text-slate-400">
+                      Code: <span className="font-mono bg-slate-800/80 px-2 py-1 rounded">{room.joinCode}</span>
                       {currentUser.id === room.createdById && (
-                        <span className="ml-2 px-2 py-1 bg-emerald-600/20 text-emerald-400 rounded text-xs font-bold">
+                        <span className="ml-2 px-2 py-1 bg-sky-900/30 text-sky-300 rounded text-xs font-bold inline-flex items-center gap-1">
+                          <RiDoorLockBoxLine />
                           OWNER
                         </span>
                       )}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-neutral-400">{room.members.length} Member{room.members.length !== 1 ? 's' : ''}</p>
-                    <p className="text-xs text-neutral-500">Created by {room.createdBy.name}</p>
+                    <p className="text-sm text-slate-400">{room.members.length} Member{room.members.length !== 1 ? 's' : ''}</p>
+                    <p className="text-xs text-slate-500">Created by {room.createdBy.name}</p>
                   </div>
                 </Link>
               ))}

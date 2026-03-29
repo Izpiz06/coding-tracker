@@ -16,21 +16,21 @@ export default async function ProblemsPage() {
   });
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-50 p-8">
-      <div className="max-w-6xl mx-auto">
+    <main className="site-shell text-slate-100">
+      <div className="site-container max-w-6xl">
 
         {/* Header with Navigation Back to Dashboard */}
-        <div className="flex flex-col md:flex-row items-center justify-between mb-10 gap-4 bg-neutral-900/50 p-6 rounded-2xl border border-neutral-800">
+        <div className="panel flex flex-col md:flex-row items-center justify-between mb-10 gap-4 p-6">
           <div>
-            <h1 className="text-3xl font-extrabold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent mb-2">
+            <h1 className="text-3xl font-extrabold tracking-tight text-slate-100 mb-2">
               All Solved Problems
             </h1>
-            <p className="text-neutral-400 text-sm">A complete history of every question tracked in the database.</p>
+            <p className="text-slate-400 text-sm">A complete history of every question tracked in the database.</p>
           </div>
 
           <Link
             href="/"
-            className="px-6 py-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 rounded-lg font-bold text-sm transition-colors flex items-center gap-2"
+            className="btn-ghost px-6 py-2 text-sm transition-colors flex items-center gap-2"
           >
             ← Back to Dashboard
           </Link>
