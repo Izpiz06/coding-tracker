@@ -3,7 +3,11 @@
 
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-export default function LanguagePieChart({ submissions }: { submissions: any[] }) {
+interface Submission {
+  language?: string | null;
+}
+
+export default function LanguagePieChart({ submissions }: { submissions: Submission[] }) {
   // 1. Group the submissions by language and count them
   const languageCounts = new Map<string, number>();
 

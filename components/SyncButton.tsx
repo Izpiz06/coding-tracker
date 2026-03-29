@@ -5,41 +5,49 @@ import { useRouter } from 'next/navigation';
 
 export default function SyncButton() {
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
   const router = useRouter();
 
   async function handleSync() {
-    // 1. Ask for the admin passcode
-    const passcode = window.prompt("Enter Admin Passcode to force sync:");
-    
-    if (!passcode) return; // Cancel if they click outside or leave it blank
-
     setLoading(true);
+    setMessage('');
     
     try {
-      // 2. Send the passcode in the URL just like our backend expects
-      const res = await fetch(`/api/sync?passcode=${passcode}`);
+      const res = await fetch('/api/profile-sync', {
+        method: 'POST',
+      });
       const data = await res.json();
       
       if (res.ok) {
-        alert("Sync complete! Data is fresh.");
-        router.refresh(); // This tells Next.js to reload the charts with new data
+        setMessage(`✓ Synced ${data.snapshotsCreated} platform(s)!`);
+        setTimeout(() => {
+          router.refresh();
+          setMessage('');
+        }, 1500);
       } else {
-        alert(data.error || "Failed to sync. Wrong passcode?");
+        setMessage(data.error || "Failed to sync");
       }
-    } catch (error) {
-      alert("Network error. Try again.");
+    } catch (err) {
+      setMessage('Network error. Try again.');
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <button 
-      onClick={handleSync}
-      disabled={loading}
-      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold text-sm transition-all disabled:opacity-50"
-    >
-      {loading ? 'Syncing Stats...' : 'Force Sync'}
-    </button>
+    <div className="flex flex-col gap-2">
+      <button 
+        onClick={handleSync}
+        disabled={loading}
+        className="btn-primary px-4 py-2 text-sm disabled:opacity-50"
+      >
+        {loading ? 'Syncing Stats...' : 'Force Sync'}
+      </button>
+      {message && (
+        <p className={`text-xs ${message.startsWith('✓') ? 'text-emerald-300' : 'text-rose-300'}`}>
+          {message}
+        </p>
+      )}
+    </div>
   );
 }

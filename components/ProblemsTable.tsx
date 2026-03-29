@@ -3,8 +3,19 @@
 
 import { useState } from 'react';
 
+interface Submission {
+  id: number;
+  platform: string;
+  problemName: string;
+  language?: string | null;
+  solvedAt: Date | string;
+  user?: {
+    name: string;
+  };
+}
+
 // 1. We create a smaller component to handle the UI for a single user
-function UserColumn({ userName, userSubmissions }: { userName: string, userSubmissions: any[] }) {
+function UserColumn({ userName, userSubmissions }: { userName: string, userSubmissions: Submission[] }) {
   const [activeTab, setActiveTab] = useState('LEETCODE');
   const [search, setSearch] = useState('');
 
@@ -17,18 +28,18 @@ function UserColumn({ userName, userSubmissions }: { userName: string, userSubmi
   });
 
   return (
-    <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-xl flex flex-col h-[700px]">
-      <h2 className="text-2xl font-bold mb-4 text-white border-b border-neutral-800 pb-4">
-        {userName}'s Log
+    <div className="panel p-6 flex flex-col h-[700px]">
+      <h2 className="text-2xl font-bold mb-4 text-slate-100 border-b border-slate-700/50 pb-4">
+        {userName}&apos;s Log
       </h2>
 
       {/* Platform Tabs */}
-      <div className="flex bg-neutral-950 border border-neutral-800 rounded-lg p-1 mb-4">
+      <div className="flex bg-slate-950/70 border border-slate-700/60 rounded-lg p-1 mb-4">
         <button
           onClick={() => setActiveTab('LEETCODE')}
           className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${activeTab === 'LEETCODE'
-              ? 'bg-orange-500/20 text-orange-400 shadow-sm'
-              : 'text-neutral-500 hover:text-neutral-300'
+              ? 'bg-slate-700/40 text-slate-100 shadow-sm'
+              : 'text-slate-500 hover:text-slate-300'
             }`}
         >
           LeetCode
@@ -36,8 +47,8 @@ function UserColumn({ userName, userSubmissions }: { userName: string, userSubmi
         <button
           onClick={() => setActiveTab('CODEFORCES')}
           className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${activeTab === 'CODEFORCES'
-              ? 'bg-blue-500/20 text-blue-400 shadow-sm'
-              : 'text-neutral-500 hover:text-neutral-300'
+              ? 'bg-slate-700/40 text-slate-100 shadow-sm'
+              : 'text-slate-500 hover:text-slate-300'
             }`}
         >
           Codeforces
@@ -50,37 +61,37 @@ function UserColumn({ userName, userSubmissions }: { userName: string, userSubmi
         placeholder={`Search ${activeTab} problems...`}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full bg-neutral-950 border border-neutral-700 rounded-lg px-4 py-2 text-neutral-100 focus:outline-none focus:border-emerald-500 transition-colors mb-4 text-sm"
+        className="w-full input-dark px-4 py-2 transition-colors mb-4 text-sm"
       />
 
       {/* Scrolling Table Area */}
-      <div className="flex-grow overflow-y-auto pr-2 rounded-lg border border-neutral-800/50">
+      <div className="flex-grow overflow-y-auto pr-2 rounded-lg border border-slate-700/40">
         <table className="w-full text-left text-sm">
-          <thead className="bg-neutral-950 sticky top-0 text-neutral-400 uppercase tracking-wider text-xs z-10 shadow-sm">
+          <thead className="bg-slate-950/80 sticky top-0 text-slate-400 uppercase tracking-wider text-xs z-10 shadow-sm">
             <tr>
               <th className="px-4 py-3 font-medium">Date</th>
               <th className="px-4 py-3 font-medium">Problem</th>
               <th className="px-4 py-3 font-medium">Lang</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-neutral-800/50">
+          <tbody className="divide-y divide-slate-700/40">
             {filteredSubmissions.length > 0 ? (
               filteredSubmissions.map((sub) => (
-                <tr key={sub.id} className="hover:bg-neutral-800/40 transition-colors">
-                  <td className="px-4 py-3 text-neutral-400 whitespace-nowrap text-xs">
+                <tr key={sub.id} className="hover:bg-slate-800/30 transition-colors">
+                  <td className="px-4 py-3 text-slate-400 whitespace-nowrap text-xs">
                     {new Date(sub.solvedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </td>
-                  <td className="px-4 py-3 text-emerald-400 font-medium">
+                  <td className="px-4 py-3 text-slate-200 font-medium">
                     {sub.problemName}
                   </td>
-                  <td className="px-4 py-3 text-neutral-400 text-xs">
+                  <td className="px-4 py-3 text-slate-400 text-xs">
                     {sub.language || '-'}
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={3} className="px-4 py-8 text-center text-neutral-500 italic">
+                <td colSpan={3} className="px-4 py-8 text-center text-slate-500 italic">
                   No {activeTab} problems found.
                 </td>
               </tr>
@@ -93,12 +104,12 @@ function UserColumn({ userName, userSubmissions }: { userName: string, userSubmi
 }
 
 // 2. The Main Component that groups the data and renders the columns side-by-side
-export default function ProblemsTable({ submissions = [] }: { submissions?: any[] }) {
+export default function ProblemsTable({ submissions = [] }: { submissions?: Submission[] }) {
 
   // 1. Safety check! If there are no submissions, stop right here.
   if (!submissions || submissions.length === 0) {
     return (
-      <div className="text-center text-neutral-500 italic mt-10">
+      <div className="text-center text-slate-500 italic mt-10">
         No problem data available. Sync to fetch data.
       </div>
     );
@@ -111,7 +122,7 @@ export default function ProblemsTable({ submissions = [] }: { submissions?: any[
     if (!acc[userName]) acc[userName] = [];
     acc[userName].push(sub);
     return acc;
-  }, {} as Record<string, any[]>);
+  }, {} as Record<string, Submission[]>);
 
   const userNames = Object.keys(groupedByUser);
 

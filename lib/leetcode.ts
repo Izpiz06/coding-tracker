@@ -22,6 +22,14 @@ export async function getLeetCodeStats(username: string) {
     }
   `;
 
+  interface LeetCodeSubmission {
+    id: string;
+    title: string;
+    titleSlug: string;
+    timestamp: string;
+    lang: string;
+  }
+
   try {
     const response = await fetch('https://leetcode.com/graphql', {
       method: 'POST',
@@ -47,11 +55,11 @@ export async function getLeetCodeStats(username: string) {
       throw new Error(`LeetCode user ${username} not found`);
     }
 
-    const statsArray = data.data.matchedUser.submitStatsGlobal.acSubmissionNum;
-    const recentSubmissions = data.data.recentAcSubmissionList || [];
+    const statsArray: { difficulty: string; count: number }[] = data.data.matchedUser.submitStatsGlobal.acSubmissionNum;
+    const recentSubmissions: LeetCodeSubmission[] = data.data.recentAcSubmissionList || [];
 
     // Format the recent submissions to match our new Prisma Submission model
-    const formattedSubmissions = recentSubmissions.map((sub: any) => ({
+    const formattedSubmissions = recentSubmissions.map((sub) => ({
       platform: 'LEETCODE',
       problemId: sub.titleSlug, // e.g., "two-sum"
       problemName: sub.title,   // e.g., "Two Sum"
@@ -64,10 +72,10 @@ export async function getLeetCodeStats(username: string) {
     }));
 
     return {
-      totalSolved: statsArray.find((s: any) => s.difficulty === "All")?.count || 0,
-      easySolved: statsArray.find((s: any) => s.difficulty === "Easy")?.count || 0,
-      mediumSolved: statsArray.find((s: any) => s.difficulty === "Medium")?.count || 0,
-      hardSolved: statsArray.find((s: any) => s.difficulty === "Hard")?.count || 0,
+      totalSolved: statsArray.find((s) => s.difficulty === "All")?.count || 0,
+      easySolved: statsArray.find((s) => s.difficulty === "Easy")?.count || 0,
+      mediumSolved: statsArray.find((s) => s.difficulty === "Medium")?.count || 0,
+      hardSolved: statsArray.find((s) => s.difficulty === "Hard")?.count || 0,
       submissions: formattedSubmissions, // <--- We now return the recent problems!
     };
     

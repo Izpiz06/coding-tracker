@@ -1,0 +1,24 @@
+# Ignore build and cache artifacts
+.next/
+dist/
+build/
+.cache/
+node_modules/
+package-lock.json
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+.git/
+
+# Ignore sensitive info
+.env
+.env.*
+! .env.example
+
+# Ignore logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
