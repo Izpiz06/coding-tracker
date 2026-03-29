@@ -145,8 +145,21 @@ export default function ProblemsTable({ submissions = [] }: { submissions?: Subm
     );
   }
 
+  // Filter out synthetic calendar placeholder submissions
+  const realSubmissions = submissions.filter(
+    (sub) => !sub.problemId?.startsWith('lc-calendar-')
+  );
+
+  if (realSubmissions.length === 0) {
+    return (
+      <div className="text-center text-slate-500 italic mt-10">
+        No problem data available. Sync to fetch data.
+      </div>
+    );
+  }
+
   // 2. Group all submissions by the user's name
-  const groupedByUser = submissions.reduce((acc, sub) => {
+  const groupedByUser = realSubmissions.reduce((acc, sub) => {
     // Fallback to 'Unknown User' just in case a relation didn't load properly
     const userName = sub.user?.name || 'Unknown User';
     if (!acc[userName]) acc[userName] = [];

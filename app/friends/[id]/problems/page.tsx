@@ -51,7 +51,11 @@ export default function FriendProblemsPage({
                     return;
                 }
                 const data = await res.json();
-                setSubmissions(data.submissions || []);
+                // Filter out synthetic calendar placeholder submissions
+                const real = (data.submissions || []).filter(
+                    (s: Submission) => !s.problemId?.startsWith('lc-calendar-')
+                );
+                setSubmissions(real);
                 if (data.submissions?.length > 0 && data.submissions[0].user?.name) {
                     setFriendName(data.submissions[0].user.name);
                 }
@@ -66,6 +70,7 @@ export default function FriendProblemsPage({
             (sub.language && sub.language.toLowerCase().includes(search.toLowerCase()));
         return matchesPlatform && matchesSearch;
     });
+
 
     if (loading) {
         return (
