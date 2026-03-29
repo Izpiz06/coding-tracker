@@ -5,7 +5,11 @@ import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip
 } from 'recharts';
 
-export default function TopicRadarChart({ submissions }: { submissions: any[] }) {
+interface Submission {
+  tags?: string[] | null;
+}
+
+export default function TopicRadarChart({ submissions }: { submissions: Submission[] }) {
   // 1. Count the frequency of each tag
   const tagCounts = new Map<string, number>();
 
@@ -61,7 +65,6 @@ export default function TopicRadarChart({ submissions }: { submissions: any[] })
             <Tooltip
               contentStyle={{ backgroundColor: '#171717', borderColor: '#262626', borderRadius: '8px' }}
               itemStyle={{ color: '#fff' }}
-              formatter={(value: any) => [Number(value) || 0, 'Solved']}
               labelFormatter={(label) => {
                 // Find the full name for the tooltip
                 const original = data.find(d => d.subject === label);

@@ -1,5 +1,25 @@
 // src/lib/codeforces.ts
 
+interface CodeforcesSubmission {
+  id: number;
+  contestId?: number;
+  creationTimeSeconds: number;
+  problem: {
+    contestId?: number;
+    index: string;
+    name: string;
+    rating?: number;
+    tags: string[];
+  };
+  author: {
+    participantType: string;
+  };
+  programmingLanguage: string;
+  verdict?: string;
+  timeConsumedMillis: number;
+  memoryConsumedBytes: number;
+}
+
 export async function getCodeforcesStats(handle: string) {
   try {
     // 1. Fetch user profile info (rating, maxRating, rank)
@@ -16,17 +36,26 @@ export async function getCodeforcesStats(handle: string) {
     const statusData = await statusRes.json();
 
     let totalSolved = 0;
-    const submissionsList: any[] = [];
+    const submissionsList: {
+      platform: string;
+      problemId: string;
+      problemName: string;
+      language: string;
+      tags: string[];
+      runtime: number;
+      memory: number;
+      solvedAt: Date;
+    }[] = [];
     
     if (statusData.status === "OK") {
       // Use a Map to track unique problems by ID so we don't count duplicates
-      const solvedProblems = new Map();
+      const solvedProblems = new Map<string, boolean>();
       
       // Reverse the array so we process oldest submissions first. 
       // This ensures we save the exact date/time of your FIRST successful solve.
-      const allSubmissions = statusData.result.reverse();
+      const allSubmissions: CodeforcesSubmission[] = statusData.result.reverse();
       
-      allSubmissions.forEach((submission: any) => {
+      allSubmissions.forEach((submission) => {
         if (submission.verdict === "OK") {
           const problemId = `${submission.problem.contestId}-${submission.problem.index}`;
           

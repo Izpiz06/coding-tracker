@@ -13,9 +13,23 @@ enum Platform {
   CODEFORCES
 }
 
+enum RoomRole {
+  OWNER
+  MEMBER
+}
+
+enum PeriodMode {
+  WEEKLY
+  MONTHLY
+  ALL_TIME
+}
+
 model User {
   id               Int            @id @default(autoincrement())
   name             String
+  email            String?        @unique
+  passwordHash     String?
+  githubHandle     String?
   leetcodeHandle   String?        @unique
   codeforcesHandle String?        @unique
   
@@ -23,7 +37,12 @@ model User {
   updatedAt        DateTime       @updatedAt
   
   snapshots        StatSnapshot[]
-  submissions      Submission[]   // <-- This is the exact line Prisma was yelling about!
+  submissions      Submission[]
+
+  rooms            RoomMember[]
+  createdRooms     Room[]           @relation("RoomCreator")
+  roomActivities   RoomActivity[]
+  sessions         Session[]
 }
 
 model StatSnapshot {
@@ -66,4 +85,59 @@ model Submission {
 
   @@unique([userId, platform, problemId])
   @@index([userId, platform])
+}
+
+model Room {
+  id          Int            @id @default(autoincrement())
+  name        String
+  joinCode    String         @unique @db.VarChar(6)
+  roomPasscode String?       @db.VarChar(120)
+  createdById Int
+  createdBy   User           @relation("RoomCreator", fields: [createdById], references: [id])
+
+  periodMode  PeriodMode     @default(WEEKLY)
+  periodStart DateTime       @default(now())
+
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  members     RoomMember[]
+  activities  RoomActivity[]
+}
+
+model RoomMember {
+  id       Int      @id @default(autoincrement())
+  roomId   Int
+  room     Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  userId   Int
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role     RoomRole @default(MEMBER)
+  joinedAt DateTime @default(now())
+
+  @@unique([roomId, userId])
+}
+
+model RoomActivity {
+  id        Int      @id @default(autoincrement())
+  roomId    Int
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  message   String
+  scoreGain Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([roomId, createdAt])
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
 }

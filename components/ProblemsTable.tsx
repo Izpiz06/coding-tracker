@@ -3,8 +3,19 @@
 
 import { useState } from 'react';
 
+interface Submission {
+  id: number;
+  platform: string;
+  problemName: string;
+  language?: string | null;
+  solvedAt: Date | string;
+  user?: {
+    name: string;
+  };
+}
+
 // 1. We create a smaller component to handle the UI for a single user
-function UserColumn({ userName, userSubmissions }: { userName: string, userSubmissions: any[] }) {
+function UserColumn({ userName, userSubmissions }: { userName: string, userSubmissions: Submission[] }) {
   const [activeTab, setActiveTab] = useState('LEETCODE');
   const [search, setSearch] = useState('');
 
@@ -19,7 +30,7 @@ function UserColumn({ userName, userSubmissions }: { userName: string, userSubmi
   return (
     <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-xl flex flex-col h-[700px]">
       <h2 className="text-2xl font-bold mb-4 text-white border-b border-neutral-800 pb-4">
-        {userName}'s Log
+        {userName}&apos;s Log
       </h2>
 
       {/* Platform Tabs */}
@@ -93,7 +104,7 @@ function UserColumn({ userName, userSubmissions }: { userName: string, userSubmi
 }
 
 // 2. The Main Component that groups the data and renders the columns side-by-side
-export default function ProblemsTable({ submissions = [] }: { submissions?: any[] }) {
+export default function ProblemsTable({ submissions = [] }: { submissions?: Submission[] }) {
 
   // 1. Safety check! If there are no submissions, stop right here.
   if (!submissions || submissions.length === 0) {
@@ -111,7 +122,7 @@ export default function ProblemsTable({ submissions = [] }: { submissions?: any[
     if (!acc[userName]) acc[userName] = [];
     acc[userName].push(sub);
     return acc;
-  }, {} as Record<string, any[]>);
+  }, {} as Record<string, Submission[]>);
 
   const userNames = Object.keys(groupedByUser);
 

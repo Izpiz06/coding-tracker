@@ -5,12 +5,48 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 
-export default function ProgressChart({ snapshots }: { snapshots: any[] }) {
-  // 1. Group the raw database snapshots by Date
-  const dataMap = new Map();
+interface Snapshot {
+  recordedAt: Date | string;
+  platform: string;
+  totalSolved: number;
+}
 
-  snapshots.forEach((snap) => {
-    // Format the date to something clean like "Mar 14"
+interface ChartDataPoint {
+  date: string;
+  leetCodeSolved?: number;
+  codeforcesSolved?: number;
+}
+
+export default function ProgressChart({ snapshots }: { snapshots: Snapshot[] }) {
+  // Create a 7-day window (last 7 days)
+  const today = new Date();
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  // Generate all 7 day labels
+  const dayLabels = [];
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    const label = date.toLocaleDateString('en-US', {
+      month: 'short', day: 'numeric'
+    });
+    dayLabels.push(label);
+  }
+
+  // Create a complete 7-day data map with all dates
+  const dataMap = new Map<string, ChartDataPoint>();
+  dayLabels.forEach(label => {
+    dataMap.set(label, { date: label });
+  });
+
+  // Filter snapshots to last 7 days and group by date
+  const recentSnapshots = snapshots.filter((snap) => {
+    const snapDate = new Date(snap.recordedAt);
+    return snapDate >= sevenDaysAgo;
+  });
+
+  recentSnapshots.forEach((snap) => {
     const date = new Date(snap.recordedAt).toLocaleDateString('en-US', {
       month: 'short', day: 'numeric'
     });
@@ -19,7 +55,7 @@ export default function ProgressChart({ snapshots }: { snapshots: any[] }) {
       dataMap.set(date, { date });
     }
 
-    const existingDate = dataMap.get(date);
+    const existingDate = dataMap.get(date)!;
 
     // Assign the correct platform stats to that specific date
     if (snap.platform === 'LEETCODE') {
@@ -29,8 +65,8 @@ export default function ProgressChart({ snapshots }: { snapshots: any[] }) {
     }
   });
 
-  // 2. Convert to an array and reverse so the oldest date is on the left
-  const chartData = Array.from(dataMap.values()).reverse();
+  // Convert to an array in chronological order
+  const chartData = dayLabels.map(label => dataMap.get(label)!);
 
   // If there's no data yet, just show a placeholder
   if (chartData.length === 0) {
