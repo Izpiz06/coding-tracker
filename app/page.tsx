@@ -6,7 +6,7 @@ import LogoutButton from '../components/LogoutButton';
 import SyncButton from '../components/SyncButton';
 import { calculateScore } from '../lib/scoring';
 import { getCurrentUser, isProfileComplete } from '../lib/auth';
-import { RiBarChartLine, RiDoorLockBoxLine, RiGamepadLine, RiMedalLine, RiTeamLine, RiUserSettingsLine } from 'react-icons/ri';
+import { RiBarChartLine, RiDoorLockBoxLine, RiGamepadLine, RiMedalLine, RiTeamLine, RiUserHeartLine, RiUserSettingsLine } from 'react-icons/ri';
 
 export const revalidate = 0;
 
@@ -113,6 +113,12 @@ export default async function Home() {
               className="btn-ghost inline-flex items-center gap-2 px-4 py-2 text-sm"
             >
               <RiUserSettingsLine className="text-zinc-300" /> Profile
+            </Link>
+            <Link
+              href="/friends"
+              className="btn-ghost inline-flex items-center gap-2 px-4 py-2 text-sm"
+            >
+              <RiUserHeartLine className="text-zinc-300" /> Friends
             </Link>
             <SyncButton />
             <LogoutButton />

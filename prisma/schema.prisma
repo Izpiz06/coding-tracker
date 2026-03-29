@@ -24,6 +24,12 @@ enum PeriodMode {
   ALL_TIME
 }
 
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
 model User {
   id               Int            @id @default(autoincrement())
   name             String
@@ -43,6 +49,9 @@ model User {
   createdRooms     Room[]           @relation("RoomCreator")
   roomActivities   RoomActivity[]
   sessions         Session[]
+
+  friendshipsSent     Friendship[] @relation("FriendshipsSent")
+  friendshipsReceived Friendship[] @relation("FriendshipsReceived")
 }
 
 model StatSnapshot {
@@ -140,4 +149,18 @@ model Session {
 
   @@index([userId])
   @@index([expiresAt])
+}
+
+model Friendship {
+  id         Int              @id @default(autoincrement())
+  senderId   Int
+  sender     User             @relation("FriendshipsSent", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId Int
+  receiver   User             @relation("FriendshipsReceived", fields: [receiverId], references: [id], onDelete: Cascade)
+  status     FriendshipStatus @default(PENDING)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  @@unique([senderId, receiverId])
+  @@index([receiverId, status])
 }

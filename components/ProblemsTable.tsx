@@ -6,12 +6,28 @@ import { useState } from 'react';
 interface Submission {
   id: number;
   platform: string;
+  problemId?: string;
   problemName: string;
   language?: string | null;
   solvedAt: Date | string;
   user?: {
     name: string;
   };
+}
+
+function getProblemUrl(platform: string, problemId?: string): string | null {
+  if (!problemId) return null;
+  if (platform === 'LEETCODE') {
+    return `https://leetcode.com/problems/${problemId}/`;
+  }
+  if (platform === 'CODEFORCES') {
+    // problemId format: "contestId-index", e.g. "1234-A"
+    const parts = problemId.split('-');
+    if (parts.length >= 2) {
+      return `https://codeforces.com/problemset/problem/${parts[0]}/${parts.slice(1).join('')}`;
+    }
+  }
+  return null;
 }
 
 // 1. We create a smaller component to handle the UI for a single user
@@ -38,8 +54,8 @@ function UserColumn({ userName, userSubmissions }: { userName: string, userSubmi
         <button
           onClick={() => setActiveTab('LEETCODE')}
           className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${activeTab === 'LEETCODE'
-              ? 'bg-slate-700/40 text-slate-100 shadow-sm'
-              : 'text-slate-500 hover:text-slate-300'
+            ? 'bg-slate-700/40 text-slate-100 shadow-sm'
+            : 'text-slate-500 hover:text-slate-300'
             }`}
         >
           LeetCode
@@ -47,8 +63,8 @@ function UserColumn({ userName, userSubmissions }: { userName: string, userSubmi
         <button
           onClick={() => setActiveTab('CODEFORCES')}
           className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${activeTab === 'CODEFORCES'
-              ? 'bg-slate-700/40 text-slate-100 shadow-sm'
-              : 'text-slate-500 hover:text-slate-300'
+            ? 'bg-slate-700/40 text-slate-100 shadow-sm'
+            : 'text-slate-500 hover:text-slate-300'
             }`}
         >
           Codeforces
@@ -76,19 +92,33 @@ function UserColumn({ userName, userSubmissions }: { userName: string, userSubmi
           </thead>
           <tbody className="divide-y divide-slate-700/40">
             {filteredSubmissions.length > 0 ? (
-              filteredSubmissions.map((sub) => (
-                <tr key={sub.id} className="hover:bg-slate-800/30 transition-colors">
-                  <td className="px-4 py-3 text-slate-400 whitespace-nowrap text-xs">
-                    {new Date(sub.solvedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                  </td>
-                  <td className="px-4 py-3 text-slate-200 font-medium">
-                    {sub.problemName}
-                  </td>
-                  <td className="px-4 py-3 text-slate-400 text-xs">
-                    {sub.language || '-'}
-                  </td>
-                </tr>
-              ))
+              filteredSubmissions.map((sub) => {
+                const url = getProblemUrl(sub.platform, sub.problemId);
+                return (
+                  <tr key={sub.id} className="hover:bg-slate-800/30 transition-colors">
+                    <td className="px-4 py-3 text-slate-400 whitespace-nowrap text-xs">
+                      {new Date(sub.solvedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </td>
+                    <td className="px-4 py-3 font-medium">
+                      {url ? (
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-slate-200 hover:text-emerald-300 transition-colors underline underline-offset-2 decoration-slate-600 hover:decoration-emerald-400"
+                        >
+                          {sub.problemName}
+                        </a>
+                      ) : (
+                        <span className="text-slate-200">{sub.problemName}</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-slate-400 text-xs">
+                      {sub.language || '-'}
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td colSpan={3} className="px-4 py-8 text-center text-slate-500 italic">

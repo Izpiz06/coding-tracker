@@ -1,17 +1,44 @@
 // app/problems/page.tsx
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { prisma } from '../../lib/prisma';
+import { getCurrentUser } from '../../lib/auth';
 import ProblemsTable from '../../components/ProblemsTable';
 
 // Ensures the page fetches fresh data every time it loads
 export const revalidate = 0;
 
 export default async function ProblemsPage() {
-  // Fetch ALL submissions from the database, newest first, and include the user's name
+  const currentUser = await getCurrentUser();
+  if (!currentUser) {
+    redirect('/auth');
+  }
+
+  // Get accepted friend IDs
+  const friendships = await prisma.friendship.findMany({
+    where: {
+      status: 'ACCEPTED',
+      OR: [
+        { senderId: currentUser.id },
+        { receiverId: currentUser.id },
+      ],
+    },
+    select: { senderId: true, receiverId: true },
+  });
+
+  const friendIds = friendships.map((f) =>
+    f.senderId === currentUser.id ? f.receiverId : f.senderId
+  );
+
+  // Include self + friends
+  const allowedUserIds = [currentUser.id, ...friendIds];
+
+  // Fetch submissions for self + friends only
   const allSubmissions = await prisma.submission.findMany({
+    where: { userId: { in: allowedUserIds } },
     orderBy: { solvedAt: 'desc' },
     include: {
-      user: true, // This is critical so the ProblemsTable knows whose log it is!
+      user: true,
     },
   });
 
@@ -23,9 +50,9 @@ export default async function ProblemsPage() {
         <div className="panel flex flex-col md:flex-row items-center justify-between mb-10 gap-4 p-6">
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight text-slate-100 mb-2">
-              All Solved Problems
+              Solved Problems
             </h1>
-            <p className="text-slate-400 text-sm">A complete history of every question tracked in the database.</p>
+            <p className="text-slate-400 text-sm">Your problems and your friends&apos; problems.</p>
           </div>
 
           <Link

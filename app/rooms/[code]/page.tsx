@@ -17,6 +17,7 @@ import {
     RiCloseLine,
     RiGithubFill,
     RiGroupLine,
+    RiHome2Line,
     RiMedalLine,
     RiRefreshLine,
     RiShareForwardLine,
@@ -226,6 +227,13 @@ export default function RoomDashboard({
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
+                            <Link
+                                href="/"
+                                className="btn-ghost inline-flex items-center gap-2 px-4 py-2 text-sm"
+                            >
+                                <RiHome2Line className="text-zinc-300" />
+                                Dashboard
+                            </Link>
                             <Link
                                 href="/rooms"
                                 className="btn-ghost inline-flex items-center gap-2 px-4 py-2 text-sm"
