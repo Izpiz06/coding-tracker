@@ -15,13 +15,6 @@ export async function POST(
         }
 
         const { code } = await params;
-        const body = await request.json();
-        const { passcode } = body;
-
-        // Auth
-        if (passcode !== process.env.ADMIN_PASSCODE) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
 
         // Find room
         const room = await prisma.room.findUnique({

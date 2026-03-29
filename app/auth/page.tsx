@@ -38,8 +38,9 @@ export default function AuthPage() {
       }
 
       setMessage('Success! Redirecting...');
+      const redirectTo = (mode === 'login' && data.hasHandles) ? '/' : '/profile/setup';
       setTimeout(() => {
-        router.push('/profile/setup');
+        router.push(redirectTo);
       }, 600);
     } catch {
       setMessage('Network error. Try again.');

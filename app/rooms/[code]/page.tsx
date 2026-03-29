@@ -135,17 +135,10 @@ export default function RoomDashboard({
         setSyncing(true);
         setSyncMessage('');
         setSyncError(false);
-        const passcode = prompt('Enter admin passcode to sync:');
-        if (!passcode) {
-            setSyncing(false);
-            return;
-        }
 
         try {
             const res = await fetch(`/api/rooms/${code}/sync`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ passcode }),
             });
             const result = await res.json();
             if (!res.ok) {
@@ -259,8 +252,8 @@ export default function RoomDashboard({
                     </div>
                     {syncMessage && (
                         <div className={`mt-4 text-sm p-3 rounded-lg ${syncError
-                                ? 'bg-rose-900/25 text-rose-300 border border-rose-700/50'
-                                : 'bg-emerald-900/25 text-emerald-300 border border-emerald-700/50'
+                            ? 'bg-rose-900/25 text-rose-300 border border-rose-700/50'
+                            : 'bg-emerald-900/25 text-emerald-300 border border-emerald-700/50'
                             }`}>
                             {syncMessage}
                         </div>
@@ -285,8 +278,8 @@ export default function RoomDashboard({
                                         key={entry.userId}
                                         onClick={() => toggleComparison(entry.userId)}
                                         className={`flex items-center gap-4 px-6 py-4 hover:bg-zinc-800/25 cursor-pointer transition-all ${selectedUsers.includes(entry.userId)
-                                                ? 'bg-zinc-900/40 border-l-2 border-zinc-400'
-                                                : ''
+                                            ? 'bg-zinc-900/40 border-l-2 border-zinc-400'
+                                            : ''
                                             } ${entry.rank === 1 ? 'bg-gradient-to-r from-zinc-900/40 to-transparent' : ''}`}
                                     >
                                         {/* Rank */}
