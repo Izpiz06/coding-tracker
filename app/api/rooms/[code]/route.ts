@@ -4,6 +4,7 @@ import { prisma } from '../../../../lib/prisma';
 import { calculateScore, calculateDelta } from '../../../../lib/scoring';
 import { getCurrentUser } from '../../../../lib/auth';
 import { getLanguageDistributionForUser } from '../../../../lib/languageDistribution';
+import { syncUserLifetimeData } from '../../../../lib/userSync';
 
 /**
  * Get the start of the current competition period.
@@ -42,8 +43,10 @@ export async function GET(
 
         const { code } = await params;
 
-        const room = await prisma.room.findUnique({
-            where: { joinCode: code.toUpperCase() },
+        const roomCode = code.toUpperCase();
+
+        let room = await prisma.room.findUnique({
+            where: { joinCode: roomCode },
             include: {
                 createdBy: { select: { name: true } },
                 members: {
@@ -73,6 +76,96 @@ export async function GET(
         const isMember = room.members.some((member) => member.userId === currentUser.id);
         if (!isMember) {
             return NextResponse.json({ error: 'You are not a member of this room' }, { status: 403 });
+        }
+
+        const membersNeedingBackfill = room.members.filter((member) => {
+            const latestLC = member.user.snapshots.find((s) => s.platform === 'LEETCODE');
+            const latestCF = member.user.snapshots.find((s) => s.platform === 'CODEFORCES');
+
+            const lcSubmissionCount = member.user.submissions.filter(
+                (s) => s.platform === 'LEETCODE'
+            ).length;
+            const cfSubmissionCount = member.user.submissions.filter(
+                (s) => s.platform === 'CODEFORCES'
+            ).length;
+
+            const missingInitialData =
+                member.user.snapshots.length === 0 &&
+                (member.user.leetcodeHandle || member.user.codeforcesHandle);
+
+            const hasIncompleteLeetCodeBackfill =
+                Boolean(member.user.leetcodeHandle) &&
+                Boolean(latestLC) &&
+                lcSubmissionCount < (latestLC?.totalSolved || 0);
+
+            const hasIncompleteCodeforcesBackfill =
+                Boolean(member.user.codeforcesHandle) &&
+                Boolean(latestCF) &&
+                cfSubmissionCount < (latestCF?.totalSolved || 0);
+
+            const hasLeetCodeTopicData = member.user.submissions.some(
+                (s) => s.platform === 'LEETCODE' && Array.isArray(s.tags) && s.tags.length > 0
+            );
+
+            const hasMissingLeetCodeTopicData =
+                Boolean(member.user.leetcodeHandle) &&
+                Boolean(latestLC) &&
+                !hasLeetCodeTopicData;
+
+            return (
+                missingInitialData ||
+                hasIncompleteLeetCodeBackfill ||
+                hasIncompleteCodeforcesBackfill ||
+                hasMissingLeetCodeTopicData
+            );
+        });
+
+        if (membersNeedingBackfill.length > 0) {
+            for (const member of membersNeedingBackfill) {
+                const syncResult = await syncUserLifetimeData({
+                    id: member.user.id,
+                    leetcodeHandle: member.user.leetcodeHandle,
+                    codeforcesHandle: member.user.codeforcesHandle,
+                });
+
+                await prisma.roomActivity.create({
+                    data: {
+                        roomId: room.id,
+                        userId: member.user.id,
+                        message: `[SYNC] Auto-backfill on room load for ${member.user.name}: ${syncResult.newSubmissions} submissions imported`,
+                        scoreGain: 0,
+                    },
+                });
+            }
+
+            // Reload room data so leaderboard/charts use the freshly backfilled records.
+            room = await prisma.room.findUnique({
+                where: { joinCode: roomCode },
+                include: {
+                    createdBy: { select: { name: true } },
+                    members: {
+                        include: {
+                            user: {
+                                include: {
+                                    snapshots: {
+                                        orderBy: { recordedAt: 'desc' },
+                                    },
+                                    submissions: true,
+                                },
+                            },
+                        },
+                        orderBy: { joinedAt: 'asc' },
+                    },
+                    activities: {
+                        orderBy: { createdAt: 'desc' },
+                        take: 50,
+                    },
+                },
+            });
+
+            if (!room) {
+                return NextResponse.json({ error: 'Room not found after backfill' }, { status: 404 });
+            }
         }
 
         // Update period if elapsed
@@ -129,6 +222,7 @@ export async function GET(
             return {
                 userId: user.id,
                 name: user.name,
+                githubHandle: user.githubHandle,
                 role: member.role,
                 joinedAt: member.joinedAt,
                 score: score.totalScore,

@@ -1,6 +1,7 @@
 // app/rooms/join/page.tsx — Room Invite / Join Page
 'use client';
 
+import Link from 'next/link';
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -106,6 +107,11 @@ function JoinRoomForm() {
 
                 {/* Join Form */}
                 <div className="panel p-8">
+                    <div className="mb-4 flex justify-end">
+                        <Link href="/rooms" className="btn-ghost px-3 py-1 text-xs">
+                            Back to Rooms
+                        </Link>
+                    </div>
                     <h1 className="text-2xl font-bold mb-2 text-center text-emerald-400">
                         {prefilledCode ? 'Join Room' : 'Enter Room Code'}
                     </h1>

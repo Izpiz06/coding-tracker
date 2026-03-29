@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import type { GitHubStats } from '../../lib/github';
+import GitHubDevelopmentPanel from '../../components/GitHubDevelopmentPanel';
 
 interface RoomSummary {
   id: number;
@@ -14,7 +16,13 @@ interface RoomSummary {
 }
 
 export default function RoomsHubPage() {
+  const [activeSection, setActiveSection] = useState<'CP' | 'DEVELOPMENT'>('CP');
   const [authName, setAuthName] = useState('');
+  const [githubHandle, setGithubHandle] = useState<string | null>(null);
+  const [leetcodeHandle, setLeetcodeHandle] = useState<string | null>(null);
+  const [codeforcesHandle, setCodeforcesHandle] = useState<string | null>(null);
+  const [githubStats, setGithubStats] = useState<GitHubStats | null>(null);
+  const [githubLoading, setGithubLoading] = useState(false);
   const [profileComplete, setProfileComplete] = useState(false);
   const [rooms, setRooms] = useState<RoomSummary[]>([]);
   const [roomName, setRoomName] = useState('');
@@ -60,6 +68,9 @@ export default function RoomsHubPage() {
       .then((data) => {
         if (!data?.user) return;
         setAuthName(data.user.name);
+        setGithubHandle(data.user.githubHandle ?? null);
+        setLeetcodeHandle(data.user.leetcodeHandle ?? null);
+        setCodeforcesHandle(data.user.codeforcesHandle ?? null);
         setProfileComplete(Boolean(data.profileComplete));
       })
       .catch(() => {
@@ -68,6 +79,29 @@ export default function RoomsHubPage() {
 
     loadRooms();
   }, []);
+
+  useEffect(() => {
+    if (!githubHandle) {
+      setGithubStats(null);
+      return;
+    }
+
+    setGithubLoading(true);
+    fetch(`/api/github/${encodeURIComponent(githubHandle)}`)
+      .then(async (res) => {
+        if (!res.ok) return null;
+        return res.json();
+      })
+      .then((data) => {
+        setGithubStats(data?.stats ?? null);
+      })
+      .catch(() => {
+        setGithubStats(null);
+      })
+      .finally(() => {
+        setGithubLoading(false);
+      });
+  }, [githubHandle]);
 
   async function handleCreateRoom(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -128,12 +162,20 @@ export default function RoomsHubPage() {
                 Create a room, join by code, and track leaderboard progress together.
               </p>
             </div>
-            <Link
-              href="/rooms/join"
-              className="btn-ghost px-4 py-2 text-sm"
-            >
-              Join With Code
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/"
+                className="btn-ghost px-4 py-2 text-sm"
+              >
+                Back Home
+              </Link>
+              <Link
+                href="/rooms/join"
+                className="btn-ghost px-4 py-2 text-sm"
+              >
+                Join With Code
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -142,6 +184,48 @@ export default function RoomsHubPage() {
             <h2 className="section-title mb-2">Signed In As</h2>
             <div className="text-lg font-semibold text-slate-100">{authName || 'Loading...'}</div>
             <p className="text-xs text-slate-500 mt-2">Identity is automatic. No user ID needed.</p>
+
+            <div className="mt-4 inline-flex rounded-lg border border-zinc-700/60 bg-zinc-950/70 p-1">
+              <button
+                type="button"
+                onClick={() => setActiveSection('CP')}
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold tracking-wider transition-colors ${
+                  activeSection === 'CP' ? 'bg-zinc-100 text-zinc-900' : 'text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                CP
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveSection('DEVELOPMENT')}
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold tracking-wider transition-colors ${
+                  activeSection === 'DEVELOPMENT' ? 'bg-zinc-100 text-zinc-900' : 'text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                DEVELOPMENT
+              </button>
+            </div>
+
+            <div className="mt-3 flip-scene">
+              <div className={`flip-card ${activeSection === 'DEVELOPMENT' ? 'is-flipped' : ''}`}>
+                <div className="flip-face flip-front rounded-lg border border-slate-700/50 bg-slate-900/40 p-3">
+                  <div className="text-xs uppercase tracking-wider text-slate-500 mb-2">Competitive Programming</div>
+                  <div className="space-y-1 text-sm">
+                    <div className="text-slate-100">LeetCode: <span className="text-zinc-300">{leetcodeHandle || 'Not set'}</span></div>
+                    <div className="text-slate-100">Codeforces: <span className="text-zinc-300">{codeforcesHandle || 'Not set'}</span></div>
+                  </div>
+                </div>
+
+                <div className="flip-face flip-back rounded-lg border border-slate-700/50 bg-slate-900/40 p-3">
+                  <GitHubDevelopmentPanel
+                    githubHandle={githubHandle}
+                    stats={githubStats}
+                    loading={githubLoading}
+                  />
+                </div>
+              </div>
+            </div>
+
             {!profileComplete && (
               <div className="mt-4 p-3 rounded-lg border border-amber-700/50 bg-amber-900/20 text-amber-300 text-sm">
                 Complete your profile handles before creating or joining rooms.

@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import { getCurrentUser, isProfileComplete } from '../../../../lib/auth';
+import { syncUserLifetimeData } from '../../../../lib/userSync';
 
 export async function POST(request: Request) {
     try {
@@ -79,12 +80,35 @@ export async function POST(request: Request) {
             });
         });
 
+        // Auto-backfill historical stats/submissions for new members.
+        // This avoids empty leaderboard/cards right after joining.
+        const syncResult = await syncUserLifetimeData({
+            id: currentUser.id,
+            leetcodeHandle: currentUser.leetcodeHandle,
+            codeforcesHandle: currentUser.codeforcesHandle,
+        });
+
+        await prisma.roomActivity.create({
+            data: {
+                roomId: room.id,
+                userId: currentUser.id,
+                message: `[SYNC] Auto-backfill for ${currentUser.name}: ${syncResult.newSubmissions} submissions imported`,
+                scoreGain: 0,
+            },
+        });
+
         return NextResponse.json({
             success: true,
             room: {
                 id: room.id,
                 name: room.name,
                 joinCode: room.joinCode,
+            },
+            sync: {
+                snapshotsCreated: syncResult.snapshotsCreated,
+                submissionsProcessed: syncResult.submissionsProcessed,
+                newSubmissions: syncResult.newSubmissions,
+                errors: syncResult.errors,
             },
         });
     } catch (error) {
