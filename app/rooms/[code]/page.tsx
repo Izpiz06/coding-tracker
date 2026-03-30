@@ -106,7 +106,20 @@ function getDeltaDisplay(delta: number) {
     return <span className="text-slate-500">0</span>;
 }
 
-const SCORE_COLORS = ['#f4f4f5', '#d4d4d8', '#a1a1aa', '#71717a', '#52525b', '#3f3f46', '#27272a', '#18181b'];
+const SCORE_COLORS = [
+    '#6366f1', // indigo
+    '#f43f5e', // rose
+    '#10b981', // emerald
+    '#f59e0b', // amber
+    '#3b82f6', // blue
+    '#ec4899', // pink
+    '#14b8a6', // teal
+    '#8b5cf6', // violet
+    '#ef4444', // red
+    '#06b6d4', // cyan
+    '#84cc16', // lime
+    '#fb923c', // orange
+];
 
 export default function RoomDashboard({
     params,
