@@ -133,3 +133,46 @@ body {
     padding: 2rem;
   }
 }
+
+/* ── Skeleton loading ── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(30, 30, 36, 0.6) 0%,
+    rgba(55, 55, 64, 0.45) 40%,
+    rgba(30, 30, 36, 0.6) 80%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+  border-radius: 0.5rem;
+}
+
+.skeleton-text {
+  height: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-title {
+  height: 1.75rem;
+  margin-bottom: 0.75rem;
+  width: 55%;
+}
+
+.skeleton-heading {
+  height: 1.2rem;
+  margin-bottom: 0.5rem;
+  width: 35%;
+}
+
+.skeleton-circle {
+  border-radius: 50%;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
